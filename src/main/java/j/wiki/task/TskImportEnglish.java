@@ -15,7 +15,7 @@
  * along with WikiBotJ316. If not, see <https://www.gnu.org/licenses/>.
  * 
  * Author: Carlos Valenzuela Montuy
- * Version 1.01.0
+ * Version 1.1
  */
 package j.wiki.task;
 
