@@ -41,7 +41,6 @@ public class TextParser {
 	
 	public static String isDiminutive(String text)
 	{
-		List<String> dims = new ArrayList<String>();
 		String words;
 		Matcher matcher;
 		
@@ -66,10 +65,11 @@ public class TextParser {
 	public static List<String> filter(String words)
 	{
 		List<String> filtered;		
-		String[] words2 = split(words);
+		String[] words2;
 		String strLC;
 		boolean bIgnore;
 
+		words2 = split(words);
 		filtered = new ArrayList<String>();
 		
 		for(String w: words2)
@@ -104,7 +104,7 @@ public class TextParser {
 	private static String[] split(String str)
 	{
 		String[] words;
-		String regex = "(\\s*,\\s+of\\s+|\\s*,\\s*|\\s+and\\sof\\s+|\\s+and\\s+|\\s+or\\s+|\\s+or\\s?,|\\s+of\\s+|:|;|\\.|\\[\\[|\\]\\])";
+		String regex = "(\\s*,\\s+of\\s+|\\s*,\\s*|\\s+and\\sof\\s+|\\s+and\\s+|\\s+or\\s+|\\s+or\\s?,|\\s+of\\s+|:|;|\\.|\\[\\[|\\]\\]|\\s+)";
 		
 		if( str.contains(" and ") || str.contains(" or ") || str.contains(","))
 		{
@@ -123,10 +123,14 @@ public class TextParser {
 		return words;
 	}
 	
-	
-	
     private final static String WORDS = "([A-Za-z0-9\\-áéíóúñÑàèìòùäëïöüâêîôûæœçÆŒÇ&\\s\\,\\.\\:\\;]+)";	
 	private final static Pattern PAT_DIM1 = Pattern.compile("A?\\s+diminutive\\s+of\\s+" + WORDS + "+", Pattern.MULTILINE);	
 	private final static Pattern PAT_DIM2 = Pattern.compile("A?\\s+shortening\\s+of\\s+" + WORDS + "+", Pattern.MULTILINE);
-	private final static String[] TO_IGNORE = { "also", "and", "female", "frequently", "given", "male", "like", "name", "names", "neither", "of", "occasionally", "or", "rarely", "related", "then", "the", "theM"  };	
+	private final static String[] TO_IGNORE = {
+			"a", "an", 
+			"also", "and", "or",
+			"female", "male", "ambiguous",
+			"always", "ever", "frequently", "generally", "normally", "occasionally", "often", "rarely", "seldom", "sometimes", "usually",
+			"diminutive", "given", "male", "hardly", "less", "like", "name", "names", "neither", "of", "shortening", "related", "then", "the", "them" 
+			};	
 }

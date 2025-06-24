@@ -115,7 +115,10 @@ public class Entry {
 		List<String> words = TextParser.filter(strName);
 		for( String name: words)
 		{
-			addDefinition(iEtim, T_GN_DIM, name);
+			if( Util.isNotNull(name))
+			{
+				addDefinition(iEtim, T_GN_DIM, name);
+			}
 		}
 	}
 	
@@ -579,31 +582,10 @@ public class Entry {
 						// tokens ignorados
 			}			
 
-			/*			
-			
-			matcher = patSufix.matcher(line);
-			if( matcher.find() )
-			{
-				bProc = true;
-			}					
-
-			matcher = patDer.matcher(line);
-			if( matcher.find() )
-			{
-				bProc = true;
-			}		
-			
-			matcher = patBor.matcher(line);
-			if( matcher.find() )
-			{
-				bProc = true;
-			}		
-			
-			matcher = patAfix.matcher(line);
-			if( matcher.find() )
-			{
-				bProc = true;
-			}		
+/*			
+ * 	TODOS
+ * 		Eimologies
+ * 		place
 */			
 		}
 		
@@ -857,26 +839,27 @@ public class Entry {
 		strDef = Util.trim(strDef);
 		def = new Definition(strType, strDef, bLiteral);
 		
+
+		etimology = null;
 		
-		if( iEtim == 0 && etims.size() == 1)
+		while(etimology == null)
 		{
-			if( !def.isFlexibleForm() && etims.get(0).hasFlexibleForm() )
+			if( etims.size() <= iEtim )
 			{
+				int iSize = etims.size();
+				for(int i= iSize;  i<iEtim+1; ++i )
+				{				
+					etims.add(new Etimology(i) );
+				}
+			}				
+			
+			etimology = etims.get(iEtim);
+			if( !def.isFlexibleForm() && etimology.hasFlexibleForm() )
+			{
+				etimology = null;
 				++iEtim;
 			}
 		}
-		
-		if( etims.size() <= iEtim )
-		{
-			int iSize = etims.size();
-			for(int i= iSize;  i<iEtim+1; ++i )
-			{				
-				etims.add(new Etimology(i) );
-			}
-		}		
-		
-		
-		etimology = etims.get(iEtim);
 		
 		for(GramCat catgram1: etimology.gramcats)
 		{

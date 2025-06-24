@@ -111,8 +111,6 @@ public class Definition {
 
 	public int toWiki(StringBuilder buffer, int iDef)
 	{
-		List<String> words;
-			
 		
 		switch(type)
 		{

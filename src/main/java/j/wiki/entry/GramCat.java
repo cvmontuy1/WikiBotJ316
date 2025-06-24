@@ -134,7 +134,7 @@ public class GramCat {
 			case Entry.T_GN_DIM:
 				name = "Sustantivo propio";
 				wikitext = "{{sustantivo propio|en}}";
-				type = Entry.T_NOUN_PROPER;
+				this.type = Entry.T_NOUN_PROPER;
 				
 				break;
 			case Entry.T_ADVERB:

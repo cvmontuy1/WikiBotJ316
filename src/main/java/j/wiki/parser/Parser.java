@@ -19,7 +19,6 @@
 package j.wiki.parser;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.*;
 
@@ -265,12 +264,9 @@ public class Parser
 	    			Util.reportError("Group count:", iGroupCnt, " requested:", igroup);
 	    		}
 	    		return strGrp;
-	    	}	    
-	    	
-	    }
-	    
-	    
-	    private final static String WORD =  "([A-Za-z0-9\\-áéíóúñÑàèìòùäëïöüâêîôûæœçÆŒÇ&]+)";
+	    	}	    	    	
+	    }	    
+   
 	    private final static String WORDS = "([A-Za-z0-9\\-áéíóúñÑàèìòùäëïöüâêîôûæœçÆŒÇ&\\s\\,\\.\\:\\;]+)";
 	    
 	    private static final Map<TokenType, Pattern> PATTERNS = new HashMap<TokenType, Pattern>();
@@ -289,6 +285,5 @@ public class Parser
 	    	PATTERNS.put(TokenType.FILE,		Pattern.compile("\\[\\[File:(.+?)\\]\\]"));
 	    	PATTERNS.put(TokenType.EXTERNAL_LINK, Pattern.compile("\\[(https?://.+?)\\]"));
 	    }
-
     
 }

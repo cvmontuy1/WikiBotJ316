@@ -19,4 +19,15 @@ public class EntryTest {
 		
 		System.out.println(entry.toWiki());
 	}
+	
+	@Test	
+	public void test2()
+	{
+		Entry entry;
+		ParserEntry pentry = new ParserEntry("en", "Test", ParserTest.WIKITEXT1);	
+		entry = Entry.buildEntry("", pentry);
+		
+		System.out.println(entry.toWiki());
+	}
+	
 }
