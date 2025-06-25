@@ -31,7 +31,7 @@ import java.util.logging.LogManager;
 import org.wikipedia.Wiki;
 
 /**
- * Project version: 1.1a
+ * Project version: 1.1b
  * Main program
  * Executes a task
  * @author CarlosVM

@@ -15,6 +15,7 @@ gradle/
 home/
 libs/
 tmp/
+target/
 *.log
 *.trc
 *.jar

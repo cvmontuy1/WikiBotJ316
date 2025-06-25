@@ -493,6 +493,10 @@ public class Entry {
 					{
 						entry.addGramCat(iEtimology, T_NOUN);
 					}
+					else if( isProperNoun(token.getValue()) )
+					{
+						entry.addGramCat(iEtimology, T_NOUN_PROPER);
+					}
 					break;
 				case TokenType.DEFINITION:
 				case TokenType.BULLET:					
@@ -525,6 +529,11 @@ public class Entry {
 		return noun.equals(NOUN);
 	}
 	
+	private static boolean isProperNoun(String noun)
+	{
+		return noun.equals(PROPER_NOUN);
+	}
+
 	private static boolean isIPA_US(String value)
 	{
 		return  value.contains("US") ||
@@ -1034,7 +1043,9 @@ public class Entry {
 		return iEtim;
 	}
 	
-	
+	/***
+	 * Category types
+	 */
 	public final static String T_NOUN_PLURAL	= "NOUN_PLURAL";
 	public final static String T_NOUN_PROPER	= "NOUN_PROPER";
 	public final static String T_NOUN			= "NOUN";
@@ -1064,6 +1075,8 @@ public class Entry {
 	public final static String ENGLISH = "en";
 	public final static String SPANISH = "es";
 	public final static String NOUN = "Noun";
+	public final static String PROPER_NOUN = "Proper noun";
+	
 	public final static String TEMPLATE_PLURAL 		= "plural of";
 	public final static String TEMPLATE_INFLECTION = "infl of";
 	public final static String TEMPLATE_IPA			= "IPA";

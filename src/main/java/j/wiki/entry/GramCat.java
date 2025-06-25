@@ -131,6 +131,7 @@ public class GramCat {
 				name = "Forma verbal";
 				wikitext = name;				
 				break;
+			case Entry.T_NOUN_PROPER:
 			case Entry.T_PLACE:
 			case Entry.T_SURNAME:
 			case Entry.T_GN_MALE:
