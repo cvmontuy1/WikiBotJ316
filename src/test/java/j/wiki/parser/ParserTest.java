@@ -11,32 +11,36 @@ public class ParserTest {
 		ParserEntry entry;
 		
 		entry = new ParserEntry("en", "test", WIKITEXT1);
+
 		
+		/*
 		System.out.println("Entry");
-		System.out.println(entry.toString());
-		
+		System.out.println(entry.toString());		
+		System.out.println("Template count:" + entry.tree.count(TokenType.DEFINITION));
+		*/
+	
 		assertNotNull(entry.tree.find(TokenType.BULLET));
 		assertNotNull(entry.tree.find(TokenType.DEFINITION));		
 		assertNotNull(entry.tree.find(TokenType.FILE));
 		assertNotNull(entry.tree.find(TokenType.TEMPLATE,"IPA|en|/ˈiːvnɪŋz/"));
-		assertNotNull(entry.tree.find(TokenType.TITLE, "Pronunciation"));
-		assertNotNull(entry.tree.find(TokenType.TITLE, "Etymology 1"));		
-		assertNotNull(entry.tree.find(TokenType.TITLE, "Etymology 2"));
-		assertNull(entry.tree.find(TokenType.TITLE, "Etymology 3"));
+		assertNotNull(entry.tree.find(TokenType.TITLE, 	"Pronunciation"));
+		assertNotNull(entry.tree.find(TokenType.TITLE, 	"Etymology 1"));		
+		assertNotNull(entry.tree.find(TokenType.TITLE,  "Etymology 2"));
+		assertNull(entry.tree.find(TokenType.TITLE, 	"Etymology 3"));
 
 		assertNotNull(entry.tree.find(TokenType.LINK, "evening"));
-		assertTrue(entry.tree.count(TokenType.DEFINITION) == 4);		
+		assertTrue(entry.tree.count(TokenType.DEFINITION) == 5);		
 		assertTrue(entry.tree.count(TokenType.BULLET) == 6);
-		assertTrue(entry.tree.count(TokenType.TITLE) == 7);
-		assertTrue(entry.tree.count(TokenType.TEMPLATE) == 14);
-		assertTrue(entry.tree.count(TokenType.LINK) == 1);
+		assertTrue(entry.tree.count(TokenType.TITLE) == 8);
+		assertTrue(entry.tree.count(TokenType.TEMPLATE) == 16);
+		assertTrue(entry.tree.count(TokenType.LINK) == 7);
 		assertTrue(entry.tree.count(TokenType.EXTERNAL_LINK) == 1);
 	}
 
 /***********************************************************}
  * TEST DATA	
  */
-	
+
 	public final static String WIKITEXT1 = 
 """
 ===Pronunciation===
@@ -138,125 +142,7 @@ From {{suffix|en|evening|s|pos2=plural suffix}}.<!-- justified here to show diff
 
 ====Translations====
 {{trans-top|id=Q739|country in South America}}
-* Adyghe: {{t|ady|Коломбие}}
-* Afrikaans: {{t|af|Colombia}}
-* Albanian: {{t|sq|Kolumbí|f}} {{qualifier|indefinite}}, {{t+|sq|Kolumbía|f}} {{qualifier|definite}}
-* Amharic: {{t|am|ኮሎምቢያ}}
-* Arabic: {{t|ar|كُولُومْبِيَا|f|tr=kolombiyā}}, {{t|ar|كُلُمبِية|f|tr=kolombiyā}}, {{t|ar|كُلُمبيا|f|tr=kolombiyā}}
-*: Egyptian Arabic: {{t|arz|كولومبيا|f|tr=kulumbya}}
-* Armenian: {{t+|hy|Կոլումբիա}}
-* Aromanian: {{t|rup|Culumbii|f}} {{qualifier|indefinite}}, {{t|rup|Culumbia|f}} {{qualifier|definite}}
-* Assamese: {{t|as|কলম্বিয়া}}
-* Asturian: {{t+|ast|Colombia|f}}
-* Azerbaijani: {{t+|az|Kolumbiya}}
-* Basque: {{t|eu|Kolonbia}}
-* Belarusian: {{t|be|Калу́мбія|f}}
-* Bengali: {{t+|bn|কলম্বিয়া}}, {{t|bn|কলোমবিয়া}}
-* Bhutanese: {{t|dz|ཀོ་ལོམ་བི་ཡ}}
-* Breton: {{t|br|Kolombia}}
-* Bulgarian: {{t|bg|Колу́мбия|f}}
-* Burmese: {{t|my|ကိုလံဘီယာ}}
-* Catalan: {{t+|ca|Colòmbia|f}}
-* Cherokee: {{t|chr|ᎪᎸᎻᏈᎢᎠ}}
-* Chinese:
-*: Cantonese: {{t|yue|哥倫比亞}}
-*: Mandarin: {{t+|cmn|哥倫比亞|tr=Gēlúnbǐyà}}
-*: Wu: {{t|wuu|哥倫比亞}}
-* Czech: {{t+|cs|Kolumbie|f}}
-* Danish: {{t+|da|Colombia|n}}
-* Dhivehi: {{t|dv|ކޮލަންބިއާ}}
-* Dutch: {{t+|nl|Colombia|n}}, {{t|nl|Colombië|n}} {{q|dated}}
-* Esperanto: {{t+|eo|Kolombio}}
-* Estonian: {{t+|et|Colombia}}, {{t|et|Kolumbia}}
-* Faroese: {{t|fo|Kolumbia}}
-* Finnish: {{t+|fi|Kolumbia}}
-* French: {{t+|fr|Colombie|f}}
-* Friulian: {{t|fur|Colombie|f}}
-* Galician: {{t+|gl|Colombia|f}}
-* Georgian: {{t+|ka|კოლუმბია}}
-* German: {{t+|de|Kolumbien|n}}
-* Greek: {{t+|el|Κολομβία|f}}
-* Gujarati: {{t|gu|કોલમ્બિયા}}
-* Haitian Creole: {{t|ht|Kolonbi}}
-* Hawaiian: {{t|haw|Kolomepia}}
-* Hebrew: {{t+|he|קוֹלוֹמְבְּיָה|f|tr=kolombya}}
-* Hindi: {{t+|hi|कोलम्बिया}}
-* Hungarian: {{t+|hu|Kolumbia}}
-* Icelandic: {{t+|is|Kólumbía|f}}
-* Ido: {{t+|io|Kolumbia}}
-* Indonesian: {{t+|id|Kolombia}}
-* Interlingua: {{t|ia|Colombia}}
-* Irish: {{t|ga|Colóim|f|alt=An Cholóim}}
-* Italian: {{t+|it|Colombia|f}}
-* Japanese: {{t+|ja|コロンビア|tr=Koronbia}}
-* Kalenjin: {{t-check|kln|kol}}
-* Kamba: {{t|kam|Kolombia}}
-* Kannada: {{t|kn|ಕೊಲೊಂಬಿಯ}}
-* Kazakh: {{t+|kk|Колумбия}}
-* Khmer: {{t+|km|កូឡុំប៊ី}}
-* Kikuyu: {{t|ki|Kolombia}}
-* Korean: {{t+|ko|^콜롬비아}}, {{t+|ko|^꼴롬비아}} {{qualifier|North Korea}}
-* Kurdish:
-*: Northern Kurdish: {{t+|kmr|Kolombiya}}
-* Kyrgyz: {{t|ky|Колумбия}}
-* Lao: {{t|lo|ໂກລົມບີ}}
-* Latvian: {{t+|lv|Kolumbija|f}}
-* Lithuanian: {{t+|lt|Kolumbija|f}}
-* Luhya: {{t|luy|Kolombia}}
-* Luo: {{t|luo|Kolombia}}
-* Macedonian: {{t|mk|Колумбија|f}}
-* Malay: {{t+|ms|Colombia}}
-* Malayalam: {{t|ml|കൊളംബിയ}}
-* Maori: {{t|mi|Koromōpia}}
-* Marathi: {{t|mr|कोलंबिया}}
-* Meru: {{t|mer|Kolombia}}
-* Mongolian:
-*: Cyrillic: {{t|mn|Колумби}}
-* Navajo: {{t|nv|Kolámbiya}}
-* Nepali: {{t|ne|कोलोम्बिया}}
-* Norman: {{t|nrf|Colombie|f}}
-* Norwegian:
-*: Bokmål: {{t|nb|Colombia|n}}
-* Occitan: {{t+|oc|Colómbia|f}}, {{t|oc|Colòmbia|f}}
-* Odia: {{t|or|କଲମ୍ବିଆ}}
-* Ossetian: {{t|os|Колумби}}
-* Pashto: {{t|ps|کولومبيا|f|tr=kolombyā}}
-* Persian:
-*: Dari: {{t|prs|کولَمْبِیَا}}
-*: Iranian Persian: {{t|fa-ira|کُلُمْبِیا}}
-* Polish: {{t+|pl|Kolumbia|f}}
-* Portuguese: {{t+|pt|Colômbia|f}}
-* Punjabi: {{t|pa|ਕੋਲੰਬੀਆ}}
-* Romanian: {{t+|ro|Columbia|f}}
-* Russian: {{t+|ru|Колу́мбия|f}}
-* Scots: {{t|sco|Colombie}}
-* Serbo-Croatian:
-*: Cyrillic: {{t|sh|Колу̀мбија|f}}
-*: Roman: {{t+|sh|Kolùmbija|f}}
-* Shan: {{t|shn|မိူင်းၵူဝ်ႇလမ်ႇပီႇယႃႇ}}
-* Sicilian: {{t|scn|Culummia|f}}
-* Silesian: {{t|szl|Kolůmbja|f}}
-* Sinhalese: {{t|si|කොලොම්‍බියාව}}
-* Slovak: {{t|sk|Kolumbia|f}}
-* Slovene: {{t+|sl|Kolumbija|f}}
-* Spanish: {{t+|es|Colombia|f}}
-* Swahili: {{t+|sw|Kolombia}}
-* Swedish: {{t+|sv|Colombia|n}}
 * Tagalog: {{t|tl|Kolombiya}}
-* Tajik: {{t+|tg|Кулумбия}}
-* Tamil: {{t|ta|கொலம்பியா}}
-* Tatar: {{t|tt|Колумбия}}
-* Telugu: {{t+|te|కొలంబియా}}
-* Thai: {{t+|th|โคลอมเบีย}}
-* Tibetan: {{t|bo|ཁོ་ལོམ་བི་ཡ}}
-* Tigrinya: {{t|ti|ኮሎምብያ}}
-* Turkish: {{t+|tr|Kolombiya}}
-* Turkmen: {{t|tk|Kolumbiýa}}
-* Ukrainian: {{t+|uk|Колу́мбія|f}}
-* Urdu: {{t|ur|کولَمْبِیا|m}}
-* Uyghur: {{t|ug|كولومبىيە}}
-* Uzbek: {{t+|uz|Kolumbiya}}
-* Vietnamese: {{t|vi|Cô-lôm-bi-a}}
 * Yiddish: {{t|yi|קאָלאָמביע|f}}
 * Yoruba: {{t|yo|Kòlóńbíà}}, {{t|yo|Kòlóḿbíà}}
 {{trans-bottom}}
@@ -266,20 +152,40 @@ From {{suffix|en|evening|s|pos2=plural suffix}}.<!-- justified here to show diff
 
 ===Further reading===
 * {{pedia}}
+""";		
+   
+public final static String WIKITEXT_MRI =   
+"""
+{{also|mri}}
+==English==
 
-==Asturian==
-{{wikipedia|lang=ast}}
+===Pronunciation===
+* {{audio|en|LL-Q1860 (eng)-Wodencafe-MRI.wav|a=US}}
 
-===Proper noun===
-{{ast-proper noun|f}}
+===Noun===
+{{en-noun|~}}
 
-# {{tcl|ast|Colombia|id=Q739}}
+# {{lb|en|medicine}} {{initialism of|en|magnetic resonance imaging}}.
 
-==Central Huasteca Nahuatl==
+====Translations====
+{{trans-top-also|magnetic resonance imaging|magnetic resonance imaging}}
+* Portuguese: {{t|pt|IRM|f}}
+* Russian: {{t+|ru|МРТ}}
+* Spanish: {{t+|es|TRM}}.
+* Xibe: {{t|sjo|ᠠᡞᠮ ᠠᠯ ᠠᡞ|tr=aim al ai}}
+{{trans-bottom}}
 
-===Proper noun===
-{{head|nch|proper noun}}
+====See also====
+* {{sense|magnetic resonance imaging}} {{l|en|CAT}}, {{l|en|CT}}, {{l|en|PET}}, {{l|en|X-ray}}
 
-# {{tcl|nch|Colombia|id=Q739}}
-""";		   
+===Verb===
+{{en-verb}}
+
+# {{lb|en|transitive|rare|medicine}} To [[take]] an MRI [[scan]] of.
+#* {{quote-book|en|year=2005|author=w:Donald Hall|title=The Best Day the Worst Day: Life with Jane Kenyon|location=Boston|publisher={{w|Houghton Mifflin Harcourt|Houghton Mifflin Company}}|isbn=0618478019|page={{gbooks|OoSwJtwmbZcC|100|MRIed|altpg=99–100}}|passage=When the delirium stopped and it was safe to take Versed, her doctors doped her up and she managed to endure the MRI, on condition that I remain with her all the time. They '''MRIed''' her skull for thirty minutes, and two days later '''MRIed''' her spine for an hour.}}
+#* {{quote-book|en|year=2014|author=w:Mark Herzlich|title=What It Takes: Fighting For My Life and My Love of the Game|location=New York, NY|publisher=w:New American Library|isbn=9780451468796|page={{gbooks|ofUlAgAAQBAJ|74|MRIing}}|passage=Remarkably, no one to that point had suggested '''MRIing''' my leg, which is where my pain actually was. Everyone surmised that the issue was really in my back. Dr. Smith scheduled an MRI for that very day.}}
+
+===Anagrams===
+* {{anagrams|en|a=imr|IRM|MIR|Mir|RMI|miR|mir|rim}}
+""";		
 }

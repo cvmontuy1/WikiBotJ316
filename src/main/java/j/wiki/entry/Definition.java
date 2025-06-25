@@ -93,7 +93,7 @@ public class Definition {
 	
 	public boolean isFlexibleForm()
 	{
-		return type.equals(Entry.T_NOUN_PLURAL) || type.equals(Entry.T_PRESENT_3S);	
+		return GramCat.isFlexibleForm(type);
 	}
 
 	public void setGramCat(GramCat gramcat)
@@ -155,7 +155,8 @@ public class Definition {
 				buffer.append("{{antropónimo femenino|leng=en}}.").append(Util.LF);
 				++iDef;				
 				break;
-			case Entry.T_UNISEX:
+			case Entry.T_UNISEX1:
+			case Entry.T_UNISEX2:				
 				buffer.append(";").append(iDef).append(": ");
 				buffer.append("{{antropónimo ambiguo|leng=en}}.").append(Util.LF);
 				++iDef;				

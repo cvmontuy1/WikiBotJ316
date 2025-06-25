@@ -26,19 +26,52 @@ import j.wiki.Util;
 
 public class Etimology {
 	public int iEtim;	// Número de etimologia
-	public List<Etim> etims;
+	public enum Type { UNKNOWN, INITIALS };
+	public Etimology.Type type;
+	public String text;
+	public List<EtimLang> etims;
 	public List<GramCat> gramcats;
 	
 	public Etimology(int i)
 	{
 		iEtim = i;
-		etims = new ArrayList<Etim>();
+		etims = new ArrayList<EtimLang>();
 		gramcats = new ArrayList<GramCat>();
+		type = Type.UNKNOWN;
+	}
+	
+	public static Etimology buildInitials(int iEtim, String text)
+	{
+		Etimology etim = new Etimology(iEtim);
+		etim.type = Type.INITIALS;
+		etim.text = text;	
+		return etim;
+	}
+	
+	public void addEtimLang(EtimLang etimlang)
+	{
+		etims.add(etimlang);
 	}
 	
 	public boolean hasDefs()
 	{
 		return gramcats.size() > 0;
+	}
+	
+	public int getCatsCount()
+	{
+		return gramcats.size();		
+	}
+	
+	public int getDefsCount()
+	{
+		int iCount = 0;
+		
+		for(GramCat g: gramcats)
+		{
+			iCount = iCount + g.getDefsCount();
+		}
+		return iCount;
 	}
 	
 	public GramCat getLastDef()
@@ -103,14 +136,29 @@ public class Etimology {
 	
 	public void toWiki(StringBuilder buffer)
 	{
+		String PREFIX = "{{etimología|leng=en|";
+		String SUFIX = "}}.";
 		
-		if( etims.size() == 0 )
+		buffer.append(PREFIX);
+		switch(type)
 		{
-			buffer.append("{{etimología|leng=en|}}.").append(Util.LF);
+			case Type.INITIALS:
+				buffer.append("siglas|").append(text).append("|nl=s");
+				buffer.append(SUFIX);
+				break;
+			default:
+				if( etims.size() > 0 )
+				{
+					for( EtimLang eti : etims)
+					{
+						buffer.append(eti.lang).append("|");
+						buffer.append(eti.text);
+					}
+					buffer.append("|nl=s");
+				}
+				buffer.append(SUFIX);				
+				break;
 		}
-		else
-		{
-			
-		}
+		buffer.append(Util.LF);
 	}
 }

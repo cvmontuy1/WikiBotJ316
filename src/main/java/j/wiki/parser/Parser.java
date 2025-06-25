@@ -32,8 +32,7 @@ public class Parser
 	        Token rootToken = new Token(TokenType.ROOT, "ROOT", 0, wikitext.length());
 	        if( bIgnoreTxtDecs )
 	        {
-	        	text = wikitext.replaceAll("\\[\\[", "");
-	        	text = text.replaceAll("\\]\\]", "");
+	        	text = wikitext;
 	        	text = text.replaceAll("'''", "");	        	
 	        	text = text.replaceAll("''", "");
 	        }
@@ -50,7 +49,9 @@ public class Parser
  */
 
 	    private int parseRecursive(String wikitext, int startPos, int endPos, Token parentToken) {
+	    	Token child;
 	    	TokenType type;
+	    	
 	        int currentPos = startPos;
 
 	        
@@ -72,7 +73,30 @@ public class Parser
 	            // Handle the token
 	            Token newToken = new Token(type, bestMatch.getContent(), bestMatch.start(), bestMatch.end());
 	            newToken.setLevel(bestMatch.level);
-	            parentToken.addChild(newToken);
+	            if( newToken.getType() == TokenType.LINK )
+	            {
+	            	child = parentToken.getLastChildren();
+	            	if( child != null )
+	            	{
+	            		if( 
+	            			child.getType() == TokenType.DEFINITION || 
+           					child.getType() == TokenType.TEXT || 
+         					child.getType() == TokenType.BULLET ) 	
+		            	{
+		            		child.appendValue(newToken.getValue());
+		            		child.addChild(newToken);
+		            	}
+	            	}
+	            	else
+	            	{
+	            		newToken.setType( TokenType.TEXT);
+	            		parentToken.addChild(newToken);
+	            	}
+	            }
+	            else
+	            {
+	            	parentToken.addChild(newToken);
+	            }
 	            
 	            // For container tokens, parse their content recursively
 	            if ( type.isContainer() ) 
@@ -105,10 +129,11 @@ public class Parser
 	        
 	        for (Map.Entry<TokenType, Pattern> entry : PATTERNS.entrySet()) {
 	            Matcher matcher = entry.getValue().matcher(wikitext);
-	            matcher.region(startPos, endPos);
+	            matcher.region(startPos, endPos);     	
+      
 	            
 	            if (matcher.find()) 
-	            {
+	            {           	
 	                if (result.matchresult == null || matcher.start() < result.matchresult.start()) 
 	                {
 	                    result.matchresult = matcher.toMatchResult();
@@ -159,9 +184,9 @@ public class Parser
 	        if( !parentToken.getValue().equals(text) )
 	        {
 	        	Token child = parentToken.getLastChildren();
-	        	if( child != null &&  ( child.getType() == TokenType.DEFINITION || child.getType() == TokenType.BULLET ) )
-	        	{
-	        		child.appendValue(text);
+	        	if( child != null && ( child.getType() == TokenType.DEFINITION || child.getType() == TokenType.BULLET ) )
+        		{
+        			child.appendValue(text);
 	        	}
 	        	else
 	        	{
@@ -179,7 +204,7 @@ public class Parser
 	    {
 	    	MatchResult matchresult;
 	    	TokenType type;
-	    	int level;
+	    	int level;			// Indicates title level or definition or bullet levels
 	    	
 	    	public Result()
 	    	{
@@ -247,6 +272,8 @@ public class Parser
 	    				}
 	    				level = iIdx;
 	    				break;
+	    			default:
+	    				break;
 	    		}
 	    		return content;
 	    	}
@@ -270,19 +297,19 @@ public class Parser
 	    private final static String WORDS = "([A-Za-z0-9\\-áéíóúñÑàèìòùäëïöüâêîôûæœçÆŒÇ&\\s\\,\\.\\:\\;]+)";
 	    
 	    private static final Map<TokenType, Pattern> PATTERNS = new HashMap<TokenType, Pattern>();
-	    
+
 	    static 
 	    {    
 	    	PATTERNS.put(TokenType.TEMPLATE,	Pattern.compile("\\{\\{(.+?)\\}\\}", Pattern.DOTALL));
 	    	PATTERNS.put(TokenType.LINK, 		Pattern.compile("\\[\\[" + WORDS + "\\]\\]"));
 	    	PATTERNS.put(TokenType.TITLE,		Pattern.compile("=+" + WORDS + "=+"));
-	    	PATTERNS.put(TokenType.DEFINITION, 	Pattern.compile("^(#|##|###)", Pattern.MULTILINE));
+	    	PATTERNS.put(TokenType.DEFINITION, 	Pattern.compile("^(###|##|#)", Pattern.MULTILINE));
 	    	PATTERNS.put(TokenType.BULLET,		Pattern.compile("^(\\s*\\*\\s|\\s*##?\\*\\s)", Pattern.MULTILINE));	    	
 	    	PATTERNS.put(TokenType.BOLD,		Pattern.compile("'''WORDS'''", Pattern.DOTALL));
 	    	PATTERNS.put(TokenType.ITALIC,		Pattern.compile("''WORDS''", Pattern.DOTALL));
 	    	PATTERNS.put(TokenType.COMMENT,		Pattern.compile("<!--(.+?)-->", Pattern.DOTALL));
 	    	PATTERNS.put(TokenType.REFERENCE, 	Pattern.compile("<ref(.+?)</ref>", Pattern.DOTALL));
-	    	PATTERNS.put(TokenType.FILE,		Pattern.compile("\\[\\[File:(.+?)\\]\\]"));
+	    	PATTERNS.put(TokenType.FILE,		Pattern.compile("\\[\\[File:(.+?)\\]\\]", Pattern.DOTALL));
 	    	PATTERNS.put(TokenType.EXTERNAL_LINK, Pattern.compile("\\[(https?://.+?)\\]"));
 	    }
     

@@ -49,6 +49,31 @@ public class Entry {
 		bWikipedia = false;
 	}
 	
+	public int getEtimCount()
+	{
+		return etims.size();
+	}
+	
+	public int getCatsCount()
+	{
+		int iCount = 0;
+		for(Etimology e: etims)
+		{
+			iCount = iCount + e.getCatsCount();
+		}
+		return iCount;
+	}
+	
+	public int getDefsCount()
+	{
+		int iCount = 0;
+		for(Etimology e: etims)
+		{
+			iCount = iCount + e.getDefsCount();
+		}
+		return iCount;		
+	}
+	
 	public boolean isComplete()
 	{
 		boolean bIsComplete;
@@ -78,132 +103,7 @@ public class Entry {
 			}
 		}
 		return bHas;
-	}
-	
-	
-	public void addEsTrans(String strTrans)
-	{
-		estrans.add(strTrans);
-	}
-	
-	public void addAudio(String strCode, String strAudio)
-	{
-		boolean bFound;
-		
-		bFound = false;
-		for(Pron pron: prons)
-		{
-			if( pron.name.equals(strCode) )
-			{
-				bFound = true;
-				pron.addAudio(strAudio);
-			}
-		}		
-		
-		if( !bFound )
-		{
-			Pron pron = new Pron();
-			pron.name = strCode;
-			pron.audios.add(strAudio);
-			prons.add(pron);
-		}		
-	}
-	
-	
-	public void addDim(int iEtim, String strName)
-	{
-		List<String> words = TextParser.filter(strName);
-		for( String name: words)
-		{
-			if( Util.isNotNull(name))
-			{
-				addDefinition(iEtim, T_GN_DIM, name);
-			}
-		}
-	}
-	
-	public void addNounPlural(int iEtim, String strPlural)
-	{
-		addDefinition(iEtim, T_NOUN_PLURAL, strPlural);
-	}
-
-	public void addPresent3S(int iEtim, String strPlural)
-	{
-		addDefinition(iEtim, T_PRESENT_3S, strPlural);
-	}
-
-	
-	public void addGivenName(int iEtim, String strName)
-	{
-		if( strName.equals(T_UNISEX) )
-		{
-			addDefinition(iEtim, T_GN_MALE, "");
-			addDefinition(iEtim, T_GN_FEMALE, "");
-		}
-		else
-		{
-			if( strName.equals(MALE) )
-			{
-				addDefinition(iEtim, T_GN_MALE, "");
-			}
-			else if( strName.equals(FEMALE) )
-			{
-				addDefinition(iEtim, T_GN_FEMALE, "");
-			}
-		}
-	}
-	
-	public void addPlace(int iEtim, List<String> args)
-	{
-		String strPlace;
-		
-		strPlace = TextParser.getPlace(args);
-		if( Util.isNotNull(strPlace) )
-		{
-			addDefinition(iEtim, T_PLACE, strPlace);
-		}
-	}
-	
-	public void addSurname(int iEtim)
-	{
-		addDefinition(iEtim, T_SURNAME, "");
-	}
-	
-	public void addAdv(int iEtim, String comparative, String superlative)
-	{	
-		adv_comp = comparative;
-		adv_sup = superlative;
-	}
-	
-	public void addSyn(int iEtim, String strSyn)
-	{
-		Etimology etimology;
-		
-		if( etims.size() <= iEtim )
-		{
-			int iSize = etims.size();
-			for(int i= iSize;  i<iEtim+1; ++i )
-			{				
-				etims.add(new Etimology(i) );
-			}
-		}
-		
-		etimology = etims.get(iEtim);
-		etimology.addSyn(strSyn);
-	}
-	
-	public boolean isJustFlexiveForm()
-	{
-		boolean bIsJustFlexive;
-	
-		bIsJustFlexive = false;
-		
-		if( etims.size() > 0 )
-		{
-			bIsJustFlexive = etims.get(0).hasFlexibleForm();
-		}
-		return bIsJustFlexive;
-	}
+	}	
 
 	/**
 	 * Generates wiki content
@@ -216,7 +116,7 @@ public class Entry {
 		
 		prepareWiki();
 		
-		buffer.append("{{esbozo}}").append(Util.LF);
+		buffer.append("{{creado_por_bot}}").append(Util.LF);
 		buffer.append("{{desambiguación|}}").append(Util.LF);
 		buffer.append(IDENT2).append(" {{lengua|en}} ").append(IDENT2).append(Util.LF);
 		buffer.append("{{pron-graf|leng=en");
@@ -455,7 +355,7 @@ public class Entry {
 									{
 										entry.addAPI(Entry.US, template.getParameter(2));
 									}
-									else if( isIPA_UK(template.getParameter("a")))
+									if( isIPA_UK(template.getParameter("a")))
 									{
 										entry.addAPI(Entry.UK, template.getParameter(2));
 									}
@@ -483,9 +383,16 @@ public class Entry {
 							}
 							break;
 						case TEMPLATE_WIKIPEDIA1:
-							if( template.getParameter(1).equals("Wikipedia") )
+							if( template.getUnnamedParsCnt() > 0 )
 							{
-								entry.setWikipedia();
+								if( template.getParameter(1).equals("Wikipedia") )
+								{
+									entry.setWikipedia();
+								}
+							}
+							else
+							{
+								entry.setWikipedia();								
 							}
 							break;
 						case TEMPLATE_WIKIPEDIA2:
@@ -541,7 +448,7 @@ public class Entry {
 							entry.addSurname(iEtimology);
 							break;
 						case TEMPLATE_PLACE:
-							if( template.getParameter(1).equals(SPANISH) )
+							if( template.getParameter(1).equals(ENGLISH) )
 							{
 								for(int i=1; i<=template.getUnnamedParsCnt(); ++i)
 								{
@@ -549,17 +456,30 @@ public class Entry {
 								}				
 							}
 							break;
-						case TEMPLATE_T1:
+						case TEMPLATE_T1:	// Translations
 						case TEMPLATE_T2:
 						case TEMPLATE_T3:
 						case TEMPLATE_T4:
 						case TEMPLATE_T5:
 							if( template.getParameter(1).equals(SPANISH) )
 							{
-								for(int i=1; i<=template.getUnnamedParsCnt(); ++i)
+								for(int i=2; i<=template.getUnnamedParsCnt(); ++i)
 								{
 									entry.addEsTrans(template.getParameter(i));
 								}
+							}
+							break;
+						case TEMPLATE_BOR1:
+						case TEMPLATE_BOR2:		
+							if( template.getParameter(1).equals(ENGLISH) )
+							{														
+								entry.addEtimology(iEtimology, EtimLang.Type.BORROWED, template.getParameter(2), template.getParameter(3));
+							}
+							break;
+						case TEMPLATE_INITIALS:
+							if( template.getParameter(1).equals(ENGLISH) )
+							{
+								entry.addInitials(template.getParameter(2));
 							}
 							break;
 					}
@@ -568,6 +488,10 @@ public class Entry {
 					if( isEtimology(token) )
 					{
 						iEtimology = getEtimology(token);
+					}
+					else if( isNoun(token.getValue()) )
+					{
+						entry.addGramCat(iEtimology, T_NOUN);
 					}
 					break;
 				case TokenType.DEFINITION:
@@ -585,7 +509,7 @@ public class Entry {
 /*			
  * 	TODOS
  * 		Eimologies
- * 		place
+ * 		places
 */			
 		}
 		
@@ -595,6 +519,11 @@ public class Entry {
 	
 //*********************************************************
 // PRIVATE SECTOIN	
+	
+	private static boolean isNoun(String noun)
+	{
+		return noun.equals(NOUN);
+	}
 	
 	private static boolean isIPA_US(String value)
 	{
@@ -661,6 +590,220 @@ public class Entry {
 		}
 		return iEtim + 1;
 	}
+
+	private void addEsTrans(String strTrans)
+	{
+		estrans.add(strTrans);
+	}
+	
+	private void addAudio(String strCode, String strAudio)
+	{
+		boolean bFound;
+		
+		bFound = false;
+		for(Pron pron: prons)
+		{
+			if( pron.name.equals(strCode) )
+			{
+				bFound = true;
+				pron.addAudio(strAudio);
+			}
+		}		
+		
+		if( !bFound )
+		{
+			Pron pron = new Pron();
+			pron.name = strCode;
+			pron.audios.add(strAudio);
+			prons.add(pron);
+		}		
+	}
+	
+	
+	private void addDim(int iEtim, String strName)
+	{
+		List<String> words = TextParser.filter(strName);
+		for( String name: words)
+		{
+			if( Util.isNotNull(name))
+			{
+				addDefinition(iEtim, T_GN_DIM, name);
+			}
+		}
+	}
+	
+	private void addNounPlural(int iEtim, String strPlural)
+	{
+		addDefinition(iEtim, T_NOUN_PLURAL, strPlural);
+	}
+
+	private void addPresent3S(int iEtim, String strPlural)
+	{
+		addDefinition(iEtim, T_PRESENT_3S, strPlural);
+	}
+	
+	private void addGramCat(int iEtim, String type)
+	{
+		Etimology etimology = null;
+		GramCat gramcat;
+		boolean bFound;
+		
+		while(etimology == null)
+		{
+			if( etims.size() <= iEtim )
+			{
+				int iSize = etims.size();
+				for(int i= iSize;  i<iEtim+1; ++i )
+				{				
+					etims.add(new Etimology(i) );
+				}
+			}				
+			
+			etimology = etims.get(iEtim);
+			if( !GramCat.isFlexibleForm(type) && etimology.hasFlexibleForm() )
+			{
+				etimology = null;
+				++iEtim;
+			}
+		}
+		
+		bFound = false;
+		for(GramCat catgram1: etimology.gramcats)
+		{
+			if( catgram1.type == type )
+			{
+				bFound = true;
+				break;
+			}
+		}
+		
+		if( !bFound)
+		{
+			gramcat = GramCat.build(type);
+			etimology.gramcats.add(gramcat);
+		}
+				
+	}
+	
+	private void addGivenName(int iEtim, String strName)
+	{
+		if( strName.equals(T_UNISEX1) || strName.equals(T_UNISEX2) )
+		{
+			addDefinition(iEtim, T_GN_MALE, "");
+			addDefinition(iEtim, T_GN_FEMALE, "");
+		}
+		else
+		{
+			if( strName.equals(MALE) )
+			{
+				addDefinition(iEtim, T_GN_MALE, "");
+			}
+			else if( strName.equals(FEMALE) )
+			{
+				addDefinition(iEtim, T_GN_FEMALE, "");
+			}
+		}
+	}
+	
+	private void addPlace(int iEtim, List<String> args)
+	{
+		String strPlace;
+		
+		strPlace = TextParser.getPlace(args);
+		if( Util.isNotNull(strPlace) )
+		{
+			addDefinition(iEtim, T_PLACE, strPlace);
+		}
+	}
+	
+	private void addSurname(int iEtim)
+	{
+		addDefinition(iEtim, T_SURNAME, "");
+	}
+	
+	private void addAdv(int iEtim, String comparative, String superlative)
+	{	
+		adv_comp = comparative;
+		adv_sup = superlative;
+	}
+	
+	private void addSyn(int iEtim, String strSyn)
+	{
+		Etimology etimology;
+		
+		if( etims.size() <= iEtim )
+		{
+			int iSize = etims.size();
+			for(int i= iSize;  i<iEtim+1; ++i )
+			{				
+				etims.add(new Etimology(i) );
+			}
+		}
+		
+		etimology = etims.get(iEtim);
+		etimology.addSyn(strSyn);
+	}
+	
+	private Etimology getEtimology(int i)
+	{
+		Etimology etim = null;
+		
+		for(Etimology e: etims)
+		{
+			if( e.iEtim == i)
+			{
+				etim = e;
+			}
+		}
+		
+		if( etim == null)
+		{
+			etim = new Etimology(i);
+			etims.add(etim);
+		}
+		
+		return etim;
+	}
+	
+	private void addEtimology(int iEtim, EtimLang.Type type, String lang, String words)
+	{
+		Etimology etim = getEtimology(iEtim);
+		etim.addEtimLang(new EtimLang(type, lang, words));
+	}
+	
+	private void addInitials(String strInitials)
+	{
+		Etimology etimology;
+		int iEtim = 0;
+		boolean bFound = false;
+	
+		for( Etimology e: etims)
+		{
+			if(
+				e.type == Etimology.Type.UNKNOWN ||
+				(e.type == Etimology.Type.INITIALS && e.text.equals(strInitials))
+			)
+			{
+				if( e.type == Etimology.Type.UNKNOWN  )
+				{
+					e.type = Etimology.Type.INITIALS;
+					e.text = strInitials;
+				}
+				bFound=true;
+				break;
+			}
+			if( iEtim <= e.iEtim )
+			{
+				iEtim = e.iEtim + 1;
+			}
+		}
+		
+		if( !bFound )
+		{
+			etimology = Etimology.buildInitials(iEtim, strInitials);		
+			etims.add(etimology);
+		}
+	}
 	
 	private void addHomophon(String strHomophone)
 	{
@@ -707,7 +850,7 @@ public class Entry {
 		}
 	}
 	
-
+	
 	private void prepareWiki()
 	{
 		int iEtim = 0;
@@ -901,7 +1044,8 @@ public class Entry {
 	public final static String T_SURNAME		= "SURNAME";
 	public final static String T_GN_MALE		= "GIVEN_NAME_MALE";
 	public final static String T_GN_FEMALE		= "GIVEN_NAME_FEMALE";
-	public final static String T_UNISEX			= "unisex";
+	public final static String T_UNISEX1		= "unisex";
+	public final static String T_UNISEX2		= "ambiguous";
 	public final static String T_GN_DIM			= "GIVEN_NAME_DIM";
 	
 	public final static String IDENT1	= "=";
@@ -919,15 +1063,16 @@ public class Entry {
 	
 	public final static String ENGLISH = "en";
 	public final static String SPANISH = "es";
-	public final static String TEMPLATE_PLURAL = "plural of";
+	public final static String NOUN = "Noun";
+	public final static String TEMPLATE_PLURAL 		= "plural of";
 	public final static String TEMPLATE_INFLECTION = "infl of";
-	public final static String TEMPLATE_IPA = "IPA";
-	public final static String TEMPLATE_AUDIO = "audio";
-	public final static String TEMPLATE_WIKIPEDIA1 = "pedia";
-	public final static String TEMPLATE_WIKIPEDIA2 = "Wikipedia";
-	public final static String TEMPLATE_DIMINUTIVE = "diminutive of";
-	public final static String TEMPLATE_GIVENNAME = "given name";
-	public final static String TEMPLATE_HOMOPHONE = "homophones";
+	public final static String TEMPLATE_IPA			= "IPA";
+	public final static String TEMPLATE_AUDIO 		= "audio";
+	public final static String TEMPLATE_WIKIPEDIA1	= "pedia";
+	public final static String TEMPLATE_WIKIPEDIA2	= "Wikipedia";
+	public final static String TEMPLATE_DIMINUTIVE	= "diminutive of";
+	public final static String TEMPLATE_GIVENNAME	= "given name";
+	public final static String TEMPLATE_HOMOPHONE	= "homophones";
 	public final static String TEMPLATE_SYN1	  = "syn";
 	public final static String TEMPLATE_SYN2	  = "synonyms";
 	public final static String TEMPLATE_ADV		  = "en-adv";
@@ -938,7 +1083,9 @@ public class Entry {
 	public final static String TEMPLATE_T3		  = "t-check";
 	public final static String TEMPLATE_T4		  = "t+check";
 	public final static String TEMPLATE_T5		  = "tt";
-	
+	public final static String TEMPLATE_INITIALS  = "initialism of";
+	public final static String TEMPLATE_BOR1	  = "bor";
+	public final static String TEMPLATE_BOR2	  = "bor+";	
 	
 	
 	private static String LAST_L4;	

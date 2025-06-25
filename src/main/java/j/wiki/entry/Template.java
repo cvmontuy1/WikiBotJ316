@@ -58,7 +58,7 @@ public class Template {
 					}
 					else
 					{
-						Util.reportError("Invalid template argument", token.toString(), arguments[iArg]);
+						params.put(String.valueOf(iArg), arguments[iArg]);						
 					}
 				}
 				else

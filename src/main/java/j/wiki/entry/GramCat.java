@@ -46,6 +46,11 @@ public class GramCat {
 		return gramcat;
 	}
 	
+	public int getDefsCount()
+	{
+		return defs.size();
+	}
+	
 	public boolean isFlexibleForm()
 	{
 		return parent != null;
@@ -130,7 +135,8 @@ public class GramCat {
 			case Entry.T_SURNAME:
 			case Entry.T_GN_MALE:
 			case Entry.T_GN_FEMALE:
-			case Entry.T_UNISEX:
+			case Entry.T_UNISEX1:
+			case Entry.T_UNISEX2:				
 			case Entry.T_GN_DIM:
 				name = "Sustantivo propio";
 				wikitext = "{{sustantivo propio|en}}";
@@ -152,6 +158,11 @@ public class GramCat {
 		}	
 	}		
 		
+	public static boolean isFlexibleForm(String type)
+	{
+		return type.equals(Entry.T_NOUN_PLURAL) || type.equals(Entry.T_PRESENT_3S);	
+	}
+	
 	void toWiki(Entry entry, StringBuilder buffer)
 	{
 		buffer.append(Util.LF);

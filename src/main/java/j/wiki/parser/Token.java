@@ -48,8 +48,10 @@ public class Token {
     public List<Token> getChildren() { return children; }
     public int getStartPos() { return startPos; }
     public int getEndPos() { return endPos; }
+    
     public void setLevel(int level) { this.level = level; }
-
+    public void setType(TokenType type) { this.type = type; }
+    
     public void setParent(Token parent) { this.parent = parent; }
     public void addChild(Token child) {
         child.setParent(this);
@@ -60,11 +62,11 @@ public class Token {
     {
     	if( Util.isNullOrEmpty(this.value)  )
     	{
-    		this.value = value;
+    		this.value = value.trim();
     	}
     	else
     	{
-    		this.value = this.value + " " + value;
+    		this.value = this.value + " " + value.trim();
     	}
     }
     
@@ -148,10 +150,6 @@ public class Token {
     	{
     		for(Token t: children)
     		{
-    			if(t.type == type)
-    			{
-    				++iCount;
-    			}
     			iCount = iCount + t.count(type);
     		}
     	}    	

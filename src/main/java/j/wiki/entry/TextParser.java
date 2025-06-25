@@ -129,7 +129,7 @@ public class TextParser {
 	private final static String[] TO_IGNORE = {
 			"a", "an", 
 			"also", "and", "or",
-			"female", "male", "ambiguous",
+			"female", "male", "ambiguous", "unisex",
 			"always", "ever", "frequently", "generally", "normally", "occasionally", "often", "rarely", "seldom", "sometimes", "usually",
 			"diminutive", "given", "male", "hardly", "less", "like", "name", "names", "neither", "of", "shortening", "related", "then", "the", "them" 
 			};	

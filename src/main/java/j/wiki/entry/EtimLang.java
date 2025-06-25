@@ -19,8 +19,18 @@
 
 package j.wiki.entry;
 
-public class Etim {
-	public String lang;	
+public class EtimLang {
+	public enum Type { BORROWED, SUFIX, PREFIX, DEFAULT};
+	public Type type;
+	public String lang;		
 	public String text;
+	public String tran;
+	
+	public EtimLang(Type type, String lang, String text)
+	{
+		this.type = type;
+		this.lang = lang;
+		this.text = text;
+	}
 	
 }
