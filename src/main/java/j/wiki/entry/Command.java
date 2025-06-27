@@ -38,7 +38,7 @@ public class Command {
     	
     	for(int i=2; i<strArray.length; ++i)
     	{
-    		if( Util.isNotNull(strArray[i]))
+    		if( Util.isNotNullOrEmpty(strArray[i]))
     		{
     			buildDefinition(defs, strArray[i], i);
     		}

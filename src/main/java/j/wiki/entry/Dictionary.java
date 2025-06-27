@@ -22,56 +22,180 @@ package j.wiki.entry;
 import java.util.HashMap;
 import java.util.Map;
 
+import j.wiki.Util;
+
+
 public class Dictionary 
 {
-	private static Map<String, String> map;
+	public static final char MASCULINE = 'm';
+	public static final char FEMENINE = 'f';
+	public static final char NEUTRE = 'n';
+
+	public static GenreName get(String english, boolean bForced)
+	{
+		GenreName genrename;
+		
+		english =  english.replaceAll("\\p{Punct}", "");
+		english = english.trim();
+		if( Util.isNotNullOrEmpty(english))
+		{
+			if( map.containsKey(english))
+			{
+				genrename = map.get(english);
+			}
+			else
+			{
+				if( bForced )
+				{
+					genrename = null;
+				}
+				else
+				{
+					english = Util.concatenate(TextParser.filterConnectors(english));
+					genrename = new GenreName(english, NEUTRE);
+				}
+			}		
+		}
+		else
+		{
+			genrename = null;
+		}
+		
+		return genrename; 
+	}
 	
+	public static boolean contains(String english)
+	{
+		return map.containsKey(english);
+	}
+
 	static 
 	{
-		// Generic places
-		put("several", "varios");
-		put("ghost town", "pueblo fantasma");
-		put("village", "pueblo");
-		put("small city", "ciudad");
-		put("neighborhood", "vecindario");
-		put("town", "pueblo");
-		put("small town", "poblado");
-		put("unincorporated comunity", "comunidad");
-		put("comunity", "comunidad");
-		put("borough", "distrito");
-		put("township", "municipio");
-		put("barangay", "barrio");
 		
 		// States
-		map = new HashMap<String, String>();
+		map = new HashMap<String, GenreName>();
+
 		
-		// Countries
+		// Generic places
+		put("barangay", "barrio", MASCULINE);
+		put("borough", "distrito", MASCULINE);
+		put("city", "ciudad", FEMENINE);		
+		put("city-state", "ciudad estado", FEMENINE);		
+		put("community", "comunidad", FEMENINE);
+		put("ghost town", "pueblo fantasma", MASCULINE);
+		put("gulf", "golfo", MASCULINE);
+		put("island", "isla", FEMENINE);		
+		put("lake", "lago", MASCULINE);
+		put("locality", "localidad", FEMENINE);		
+		put("megacity", "megalópolis", FEMENINE);
+		put("monarchy", "monarquía", FEMENINE);
+		put("municipality", "municipalidad", FEMENINE);
+		put("national capital", "capital nacional", FEMENINE);		
+		put("national park", "parque nacional", MASCULINE);		
+		put("neighborhood", "vecindario", MASCULINE);		
+		put("ocean", "oceano", MASCULINE);
+		
+		put("park", "parque", MASCULINE);		
+		put("port", "puerto", MASCULINE);		
+		put("prefecture", "prefectura", FEMENINE);
+		put("protectorate", "protectorado", MASCULINE);
+		put("province", "provincia", FEMENINE);		
+		
+		put("region", "región", FEMENINE);
+		put("republic", "república", FEMENINE);
+		put("several", "varios");	
+		put("small city", "ciudad", FEMENINE);		
+		put("small town", "poblado", MASCULINE);
+		put("state capital", "capital estatal", FEMENINE);
+		put("state park", "parque estatal", MASCULINE);
+		put("town", "pueblo", MASCULINE);		
+		put("township", "municipio", MASCULINE);		
+		put("unincorporated community", "comunidad", FEMENINE);
+		put("valley", "valle", MASCULINE);
+		put("village", "villa", FEMENINE);
+		put("volcano", "volcán", MASCULINE);
+		put("zone", "zona", FEMENINE);
+
+		
+	
+		// Countries that uses English
 		put("Australia");
 		put("Barbados");	
 		put("Bahamas", "Bahamas");
 		put("Belice");
-		put("Canada");
+		put("Canada", "Canadá");
 		put("England", "Inglaterra");
+		put("Guyana");
 		put("Ireland", "Irlanda");
 		put("India");
-		put("Jamaica");		
-		
+		put("Jamaica");
 		put("Kenya", "Kenia");
 		put("Puerto Rico");		
 		put("Liberia");
 		put("New Zealand", "Nueva Zelanda");
-		put("South Africa", "Sudafrica");
-
-		put("UK", "Reino Unido");
+		put("UK", "Reino Unido");		
 		put("United Kingdom", "Reino Unido");
 		put("United States", "Estados Unidos");
 		put("United States of America", "Estados Unidos");		
 		put("USA", "Estados Unidos");
 		put("US", "Estados Unidos");
+		put("Republic of Zambia", "Zambia");		
 		put("Scotland", "Escocia");
+		put("South Africa", "Sudáfrica");
 		put("Trinidad and Tobago", "Trinidad y Tobago");
-
+		put("Zambia");
 		
+		// Other countries
+		put("Albania");
+		put("Austria");
+		put("Belgium", "Bélgica");
+		put("Bulgaria");
+		put("Croatia", "Croacia");
+		put("Denmark", "Dinamarca");
+		put("Estonia");
+		put("Finland", "Finlandia");
+		put("France", "Francia");
+		put("Greece", "Grecia");
+		put("Germany", "Alemania");
+		put("Hungary", "Hungria");		
+		put("Iceland", "Islandia");
+		put("Italy", "Italia");
+		put("Liechtenstein", "Liechtenstein");		
+		put("Lithuania", "Lituania");
+		put("Luxembourg", "Luxemburgo");
+		put("Malta");		
+		put("Monaco");
+		put("Montenegro");	
+		put("Netherlands", "Holanda");
+		put("Norway", "Noruega");
+		put("Poland", "Polonia");
+		put("Portugal");
+		put("Romania", "Rumania");
+		put("Russia", "Rusia");
+		put("Spain", "España");
+		put("Sweden", "Suecia");
+		put("Switzerland", "Suiza");
+		put("Turkey", "Turquía");
+		put("Vatican City", "Ciudad del Vaticano");
+		
+		
+
+		// Provincias de Canada
+		put("Alberta");
+		put("British Columbia");
+		put("Manitoba");
+		put("New Brunswick");
+		put("Newfoundland");
+		put("Labrador");
+		put("Nova Scotia", "Nueva Escocia");
+		put("Ontario");
+		put("Prince Edward", "Pincipe Edward");
+		put("Island","Isla");
+		put("Quebec");
+		put("Saskatchewan");
+		put("Northwest Territories");
+		put("Nunavut");
+		put("Yukon");
 		
 		// Satates USA
 		put("Alabama");
@@ -125,32 +249,57 @@ public class Dictionary
 		put("Wisconsin");  
 		put("Wyoming");
 		put("Washington DC");
-		put("Washington D.C.");
-		
+		put("Washington D.C.");		
 		 
 	}
 	
-	public static String get(String english)
-	{
-		String spanish;
-		
-		spanish = map.get(english);
-		
-		return spanish; 
-	}
 
 	
 // *************************************************************************	
 //	private section
 	private static void put(String strValue)
 	{
-		map.put(strValue, strValue);
+		put(strValue, strValue, NEUTRE);
 	}
 
-	private static void put(String english, String spanish)
+	private static void put(String strValue, String spanish)
 	{
-		map.put(english, spanish);
+		put(strValue, spanish, NEUTRE);
 	}
 	
+	private static void put(String strValue, char gender)
+	{
+		put(strValue, strValue, gender);
+	}
+
+	private static void put(String english, String spanish, char gender)
+	{
+		map.put(english, new GenreName(spanish, gender));		
+	}
 	
+	private static void put(String english, String spanish, boolean bMasc)
+	{
+		if( bMasc )
+		{
+			map.put(english, new GenreName(spanish, MASCULINE));
+		}
+		else
+		{
+			map.put(english, new GenreName(spanish, FEMENINE));
+		}
+	}
+	
+	public static class GenreName
+	{
+		char genre;
+		String name;
+		
+		public GenreName(String name, char genre)
+		{
+			this.name = name;
+			this.genre = genre;
+		}
+	}
+	
+	private static Map<String, GenreName> map;	
 }

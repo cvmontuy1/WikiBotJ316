@@ -13,11 +13,10 @@ public class ParserTest {
 		entry = new ParserEntry("en", "test", WIKITEXT1);
 
 		
-		/*
-		System.out.println("Entry");
-		System.out.println(entry.toString());		
-		System.out.println("Template count:" + entry.tree.count(TokenType.DEFINITION));
-		*/
+		//System.out.println("Entry");
+		//System.out.println(entry.toString());		
+		//System.out.println("Template count:" + entry.tree.count(TokenType.DEFINITION));
+
 	
 		assertNotNull(entry.tree.find(TokenType.BULLET));
 		assertNotNull(entry.tree.find(TokenType.DEFINITION));		
@@ -37,6 +36,16 @@ public class ParserTest {
 		assertTrue(entry.tree.count(TokenType.EXTERNAL_LINK) == 1);
 	}
 
+	@Test
+	public void testHanna()
+	{
+		ParserEntry entry;
+		
+		entry = new ParserEntry("en", "test", WIKITEXT_HANNA);
+		
+		//System.out.println(entry.toString());				
+	}
+	
 /***********************************************************}
  * TEST DATA	
  */
@@ -73,34 +82,34 @@ From {{suffix|en|evening|s|pos2=plural suffix}}.<!-- justified here to show diff
 
 	public final static String WIKITEXT_HANNA =  // Hanna
 """			
-	{{wikipedia}}
-	===Etymology 1===
-	Variant spelling of {{m|en|Hannah}} or romanization of {{der|en|he|חַנָּה|tr=Ḥanâ}}, chiefly for the mother of [[Samuel]], from {{m|he|חַנָּה||[[grace]], [[gracious]], [[graced]] with [[child]]|tr=ḥanâ}}. As an Oklahoman town, named for Hanna Bullett, one of the initial settlers. As a Polish village, named for the queen {{w|Anna Jagiellon}}.
-	====Proper noun====
-	{{en-proper noun|~|s}}
-	# {{lb|en|uncommon}} {{given name|en|female|from=Hebrew|varof=Hannah}}.
-	# {{lb|en|rare}} {{surname|en|from=matronymics}} ''based on [[Hannah]]''.
-	# {{place|en|town|p/Alberta|c/Canada}}.
-	# {{place|en|village|c/Poland}}.
-	# {{place|en|locale|c/US}}:
-	## {{place|en|unincorporated community|s/Louisiana}}.
-	## {{place|en|town|s/Oklahoma}}.
-	## {{place|en|unincorporated community|s/West Virginia}}.
-	## {{place|en|town|s/Wyoming}}.
-	===Etymology 2===
-	From anglicization of {{der|en|ga|[[Ó]] [[Annadh|hAnnaigh]]||[[descendant]] of [[Annadh]]}} under influence from [[#Etymology 1|''Hanna'']] and {{m|en|Hannah}}. As a ghost town in Missouri and unincorporated community in South Dakota, named for Ohio senator {{w|Mark Hanna}}. As an unincorporated community on Ute land in Utah, named for postmaster William P. Hanna.
-	====Proper noun====
-	{{en-proper noun}}
-	# {{surname|en|Irish and Scottish|from=Irish}}.
-	# {{place|en|locale|c/US}}:
-	## {{place|en|unincorporated community/and/CDP|co/LaPorte County|c/Indiana|;|named for a state judge}}.
-	## {{place|en|unincorporated community|s/South Dakota}}.
-	## {{place|en|unincorporated community|on [[Ute]] land in|s/Utah}}.
-	## {{place|en|ghost town|s/Missouri}}.
-	=====Alternative forms=====
-	* {{sense|surname}} {{alter|en|Hannah|Hannay|Hanney}}
-	===Anagrams===
-	* {{anagrams|en|a=aahnn|Hanan}}
+{{wikipedia}}
+===Etymology 1===
+Variant spelling of {{m|en|Hannah}} or romanization of {{der|en|he|חַנָּה|tr=Ḥanâ}}, chiefly for the mother of [[Samuel]], from {{m|he|חַנָּה||[[grace]], [[gracious]], [[graced]] with [[child]]|tr=ḥanâ}}. As an Oklahoman town, named for Hanna Bullett, one of the initial settlers. As a Polish village, named for the queen {{w|Anna Jagiellon}}.
+====Proper noun====
+{{en-proper noun|~|s}}
+# {{lb|en|uncommon}} {{given name|en|female|from=Hebrew|varof=Hannah}}.
+# {{lb|en|rare}} {{surname|en|from=matronymics}} ''based on [[Hannah]]''.
+# {{place|en|town|p/Alberta|c/Canada}}.
+# {{place|en|village|c/Poland}}.
+# {{place|en|locale|c/US}}:
+## {{place|en|unincorporated community|s/Louisiana}}.
+## {{place|en|town|s/Oklahoma}}.
+## {{place|en|unincorporated community|s/West Virginia}}.
+## {{place|en|town|s/Wyoming}}.
+===Etymology 2===
+From anglicization of {{der|en|ga|[[Ó]] [[Annadh|hAnnaigh]]||[[descendant]] of [[Annadh]]}} under influence from [[#Etymology 1|''Hanna'']] and {{m|en|Hannah}}. As a ghost town in Missouri and unincorporated community in South Dakota, named for Ohio senator {{w|Mark Hanna}}. As an unincorporated community on Ute land in Utah, named for postmaster William P. Hanna.
+====Proper noun====
+{{en-proper noun}}
+# {{surname|en|Irish and Scottish|from=Irish}}.
+# {{place|en|locale|c/US}}:
+## {{place|en|unincorporated community/and/CDP|co/LaPorte County|c/Indiana|;|named for a state judge}}.
+## {{place|en|unincorporated community|s/South Dakota}}.
+## {{place|en|unincorporated community|on [[Ute]] land in|s/Utah}}.
+## {{place|en|ghost town|s/Missouri}}.
+=====Alternative forms=====
+* {{sense|surname}} {{alter|en|Hannah|Hannay|Hanney}}
+===Anagrams===
+* {{anagrams|en|a=aahnn|Hanan}}
 """	;
 	
 	public final static String WIKITEXT_CHARLY  =  

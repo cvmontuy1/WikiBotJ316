@@ -48,8 +48,11 @@ public class Entry {
 		
 		bWikipedia = false;
 	}
+
+//*********************************************************************	
+// Audit functions
 	
-	public int getEtimCount()
+	public int Count()
 	{
 		return etims.size();
 	}
@@ -74,13 +77,18 @@ public class Entry {
 		return iCount;		
 	}
 	
+	public int getEtimCount()
+	{
+		return etims.size();
+	}
+	
 	public boolean isComplete()
 	{
 		boolean bIsComplete;
 		
 		bIsComplete = false;
-		if( Util.isNotNull(lang) && 
-		    Util.isNotNull(entry) &&
+		if( Util.isNotNullOrEmpty(lang) && 
+		    Util.isNotNullOrEmpty(entry) &&
 		    etims.size() > 0 &&
 		    hasDefs()
 		  )
@@ -114,8 +122,7 @@ public class Entry {
 		StringBuilder buffer = new StringBuilder();
 		int iPron, iAudio, iAPI, iDef;
 		
-		prepareWiki();
-		
+	
 		buffer.append("{{creado_por_bot}}").append(Util.LF);
 		buffer.append("{{desambiguación|}}").append(Util.LF);
 		buffer.append(IDENT2).append(" {{lengua|en}} ").append(IDENT2).append(Util.LF);
@@ -450,10 +457,7 @@ public class Entry {
 						case TEMPLATE_PLACE:
 							if( template.getParameter(1).equals(ENGLISH) )
 							{
-								for(int i=1; i<=template.getUnnamedParsCnt(); ++i)
-								{
-									entry.addPlace(iEtimology, template.getParameters() );
-								}				
+								entry.addPlace(iEtimology, template);			
 							}
 							break;
 						case TEMPLATE_T1:	// Translations
@@ -471,9 +475,18 @@ public class Entry {
 							break;
 						case TEMPLATE_BOR1:
 						case TEMPLATE_BOR2:		
+						case TEMPLATE_DER:
+						case TEMPLATE_INH:
 							if( template.getParameter(1).equals(ENGLISH) )
-							{														
-								entry.addEtimology(iEtimology, EtimLang.Type.BORROWED, template.getParameter(2), template.getParameter(3));
+							{				
+								if( Util.isNotNullOrEmpty(template.getParameter("tr") ))
+								{
+									entry.addEtimology(iEtimology, EtimLang.Type.BORROWED, template.getParameter(2), template.getParameter(3), template.getParameter("tr"));
+								}
+								else
+								{
+									entry.addEtimology(iEtimology, EtimLang.Type.BORROWED, template.getParameter(2), template.getParameter(3), null);
+								}
 							}
 							break;
 						case TEMPLATE_INITIALS:
@@ -487,7 +500,7 @@ public class Entry {
 				case TokenType.TITLE:
 					if( isEtimology(token) )
 					{
-						iEtimology = getEtimology(token);
+						iEtimology = ology(token);
 					}
 					else if( isNoun(token.getValue()) )
 					{
@@ -501,21 +514,17 @@ public class Entry {
 				case TokenType.DEFINITION:
 				case TokenType.BULLET:					
 					String dim = TextParser.isDiminutive(token.getValue());
-					if( Util.isNotNull(dim) )
+					if( Util.isNotNullOrEmpty(dim) )
 					{
 						entry.addDim(iEtimology, dim);
 					}
 					break;
 				default:
-						// tokens ignorados
+						// Ignored tokens
 			}			
-
-/*			
- * 	TODOS
- * 		Eimologies
- * 		places
-*/			
 		}
+		
+		entry.prepareWiki();
 		
 		return entry;
 	}
@@ -553,12 +562,12 @@ public class Entry {
 		boolean bIsEtim = false;
 		if( t.getType() == TokenType.TITLE)
 		{
-			bIsEtim = t.getValue().contains("Etimology");
+			bIsEtim = t.getValue().contains("Etymology");
 		}
 		return bIsEtim;
 	}
 	
-	private static int getEtimology(Token t)
+	private static int ology(Token t)
 	{
 		int iEtim = 0;
 		String words[];
@@ -634,7 +643,7 @@ public class Entry {
 		List<String> words = TextParser.filter(strName);
 		for( String name: words)
 		{
-			if( Util.isNotNull(name))
+			if( Util.isNotNullOrEmpty(name))
 			{
 				addDefinition(iEtim, T_GN_DIM, name);
 			}
@@ -714,12 +723,13 @@ public class Entry {
 		}
 	}
 	
-	private void addPlace(int iEtim, List<String> args)
+	private void addPlace(int iEtim, Template template)
 	{
 		String strPlace;
+		Place place = new Place(template);
 		
-		strPlace = TextParser.getPlace(args);
-		if( Util.isNotNull(strPlace) )
+		strPlace = place.toWiki();
+		if( Util.isNotNullOrEmpty(strPlace) )
 		{
 			addDefinition(iEtim, T_PLACE, strPlace);
 		}
@@ -762,6 +772,7 @@ public class Entry {
 			if( e.iEtim == i)
 			{
 				etim = e;
+				break;
 			}
 		}
 		
@@ -774,10 +785,10 @@ public class Entry {
 		return etim;
 	}
 	
-	private void addEtimology(int iEtim, EtimLang.Type type, String lang, String words)
+	private void addEtimology(int iEtim, EtimLang.Type type, String lang, String words, String transliteración)
 	{
 		Etimology etim = getEtimology(iEtim);
-		etim.addEtimLang(new EtimLang(type, lang, words));
+		etim.addEtimLang(new EtimLang(type, lang, words, transliteración));
 	}
 	
 	private void addInitials(String strInitials)
@@ -868,13 +879,13 @@ public class Entry {
 		
 		clear();
 		
-		if( etims.size() > 1 )
+		for(Etimology etim: etims)
 		{
-			if( !etims.get(0).hasDefs() )
+			if( !etim.hasDefs() )
 			{
-				etims.remove(0);
+				etims.remove(etim);
 			}
-		}		
+		}
 
 		Command cmd = TskImportEnglish.getCommand(entry);
 		if( cmd != null && cmd.hasDefs() )
@@ -953,24 +964,7 @@ public class Entry {
 			{
 				for(Definition def : etims.get(0).gramcats.get(0).defs )
 				{
-					if( def.type == T_PLACE)
-					{
-						 def.type =  T_NOUN_PROPER;
-						 StringBuilder bufferTr = new StringBuilder();
-						 for(String tr : estrans)
-						 {						 
-							 if(! bufferTr.isEmpty() )
-							 {
-								 bufferTr.append(", ");
-							 }
-							 bufferTr.append("[[").append(tr).append("]]");
-						 } 
-						 if( !bufferTr.isEmpty() )
-						 {
-							 bufferTr.append(".");
-						 }
-						 def.text = bufferTr.toString();
-					}
+					
 				}
 			}
 		}
@@ -990,28 +984,30 @@ public class Entry {
 		
 		strDef = Util.trim(strDef);
 		def = new Definition(strType, strDef, bLiteral);
-		
-
 		etimology = null;
 		
-		while(etimology == null)
+		if( def.isFlexibleForm() )
 		{
-			if( etims.size() <= iEtim )
+			for(Etimology etim : etims)
 			{
-				int iSize = etims.size();
-				for(int i= iSize;  i<iEtim+1; ++i )
-				{				
-					etims.add(new Etimology(i) );
+				if( etim.hasFlexibleForm() )
+				{
+					etimology = etim;
 				}
-			}				
-			
-			etimology = etims.get(iEtim);
-			if( !def.isFlexibleForm() && etimology.hasFlexibleForm() )
+			}
+
+			if( etimology == null)
 			{
-				etimology = null;
-				++iEtim;
+				iEtim = etims.size() + 1;
+				etimology = new Etimology(iEtim);
+				etims.add(etimology);
 			}
 		}
+		else
+		{
+			etimology = getEtimology(iEtim);
+		}
+		
 		
 		for(GramCat catgram1: etimology.gramcats)
 		{
@@ -1099,6 +1095,8 @@ public class Entry {
 	public final static String TEMPLATE_INITIALS  = "initialism of";
 	public final static String TEMPLATE_BOR1	  = "bor";
 	public final static String TEMPLATE_BOR2	  = "bor+";	
+	public final static String TEMPLATE_DER		  = "der";
+	public final static String TEMPLATE_INH		  = "inherited";
 	
 	
 	private static String LAST_L4;	

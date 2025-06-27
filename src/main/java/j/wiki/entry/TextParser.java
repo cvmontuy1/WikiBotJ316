@@ -19,6 +19,7 @@
 package j.wiki.entry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,14 +32,6 @@ import j.wiki.Util;
  */
 public class TextParser {
 
-	public static String getPlace(List<String> args)
-	{
-		String strPlace = null;
-		
-		return strPlace;
-	}
-	
-	
 	public static String isDiminutive(String text)
 	{
 		String words;
@@ -64,6 +57,22 @@ public class TextParser {
 
 	public static List<String> filter(String words)
 	{
+		return filter0(words, TO_IGNORE);
+	}
+	
+	public static List<String> filterConnectors(String words)
+	{
+		return filter0(words, CONNECTORS);
+	}
+
+	
+
+/*************
+ * PRIVATE SECITON
+ */
+	
+	private static List<String> filter0(String words, String[] filter)
+	{
 		List<String> filtered;		
 		String[] words2;
 		String strLC;
@@ -76,7 +85,7 @@ public class TextParser {
 		{
 			strLC = w.toLowerCase();
 			bIgnore = false;
-			for( String test: TO_IGNORE)
+			for( String test: filter)
 			{
 				if( test.equals(strLC) )
 				{
@@ -96,10 +105,6 @@ public class TextParser {
 		return filtered;
 	}
 	
-
-/*************
- * PRIVATE SECITON
- */
 	
 	private static String[] split(String str)
 	{
@@ -126,11 +131,23 @@ public class TextParser {
     private final static String WORDS = "([A-Za-z0-9\\-áéíóúñÑàèìòùäëïöüâêîôûæœçÆŒÇ&\\s\\,\\.\\:\\;]+)";	
 	private final static Pattern PAT_DIM1 = Pattern.compile("A?\\s+diminutive\\s+of\\s+" + WORDS + "+", Pattern.MULTILINE);	
 	private final static Pattern PAT_DIM2 = Pattern.compile("A?\\s+shortening\\s+of\\s+" + WORDS + "+", Pattern.MULTILINE);
-	private final static String[] TO_IGNORE = {
-			"a", "an", 
-			"also", "and", "or",
+	
+	private final static String[] CONNECTORS = { "a", "an", "in", "on", "of", "and", "or", "from", "the"};
+	private final static String[] NO_NOUNS = {
 			"female", "male", "ambiguous", "unisex",
-			"always", "ever", "frequently", "generally", "normally", "occasionally", "often", "rarely", "seldom", "sometimes", "usually",
-			"diminutive", "given", "male", "hardly", "less", "like", "name", "names", "neither", "of", "shortening", "related", "then", "the", "them" 
+			"always", "ever", "frequently", "generally", "hardly", "normally", "occasionally", "often", "rarely", "seldom", "sometimes", "usually",
+			"also", "dim.", "diminutive", "given", "less", "like", "more", "name", "names", "neither", "shortening", "related", "then", "them" 
 			};	
+	
+	private final static String[] TO_IGNORE;
+	static 
+	{
+		List<String> words = new ArrayList<String>();
+		
+		words.addAll(Arrays.asList(CONNECTORS));
+		words.addAll(Arrays.asList(NO_NOUNS));
+		TO_IGNORE = words.toArray(new String[0]);
+	}
+	
+	
 }

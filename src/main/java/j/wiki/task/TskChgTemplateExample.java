@@ -178,7 +178,7 @@ implements ITask
 		
 		public boolean isOk()
 		{
-			return Util.isNotNull(strOld) && Util.isNotNull(strNew);
+			return Util.isNotNullOrEmpty(strOld) && Util.isNotNullOrEmpty(strNew);
 		}
 	}
     

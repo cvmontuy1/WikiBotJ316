@@ -52,7 +52,7 @@ public class Pron {
 			apis = strApi.split("\\s?/\\s?\\|\\s?/\\s?");
 			for(String api: apis)
 			{
-				if( Util.isNotNull(api))
+				if( Util.isNotNullOrEmpty(api))
 				{
 					ipas.add(api);
 				}

@@ -55,7 +55,12 @@ public class Etimology {
 	
 	public boolean hasDefs()
 	{
-		return gramcats.size() > 0;
+		int iDefCnt = 0;
+		for(GramCat gramcat: gramcats )
+		{
+			iDefCnt += gramcat.getDefsCount();
+		}
+		return iDefCnt > 0;
 	}
 	
 	public int getCatsCount()
@@ -137,26 +142,54 @@ public class Etimology {
 	public void toWiki(StringBuilder buffer)
 	{
 		String PREFIX = "{{etimología|leng=en|";
-		String SUFIX = "}}.";
+		String PREFIX2 = "{{etim|leng=en|";
+		String SUFIX = "}}";
+		int iEtim;
 		
-		buffer.append(PREFIX);
 		switch(type)
 		{
 			case Type.INITIALS:
+				buffer.append(PREFIX);				
 				buffer.append("siglas|").append(text).append("|nl=s");
 				buffer.append(SUFIX);
+				buffer.append(".");
 				break;
 			default:
 				if( etims.size() > 0 )
 				{
+					iEtim = 0;
 					for( EtimLang eti : etims)
 					{
+						if( iEtim == 0)
+						{
+							buffer.append(PREFIX);							
+						}
+						else
+						{
+							buffer.append(", y este ");
+							buffer.append(PREFIX2);
+						}
 						buffer.append(eti.lang).append("|");
-						buffer.append(eti.text);
+						if( !Util.isLinked(eti.text) && Util.isSingleWord(eti.text) )
+						{
+							buffer.append(Util.link(eti.text));
+						}
+						else
+						{
+							buffer.append(eti.text);
+						}
+						buffer.append("|nl=s");						
+						buffer.append(SUFIX);						
+						++iEtim;
 					}
-					buffer.append("|nl=s");
+					buffer.append(".");					
 				}
-				buffer.append(SUFIX);				
+				else
+				{
+					buffer.append(PREFIX);					
+					buffer.append(SUFIX);
+					buffer.append(".");
+				}
 				break;
 		}
 		buffer.append(Util.LF);

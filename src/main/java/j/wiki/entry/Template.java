@@ -99,7 +99,7 @@ public class Template {
 	
 	public boolean containsParameter(String name)
 	{
-		return Util.isNotNull(getParameter(name));
+		return Util.isNotNullOrEmpty(getParameter(name));
 	}
 	
 	public int getUnnamedParsCnt()

@@ -176,7 +176,7 @@ public class GramCat {
 			buffer.append(Entry.IDENT4).append(" ").append(wikitext).append(" ").append(Entry.IDENT4);
 			if( type.equalsIgnoreCase( Entry.T_ADVERB ) )
 			{
-				if( Util.isNotNull(entry.adv_comp) )
+				if( Util.isNotNullOrEmpty(entry.adv_comp) )
 				{
 					switch(entry.adv_comp)
 					{
@@ -187,7 +187,7 @@ public class GramCat {
 							buffer.append(Util.LF).append( "{{inflect.en.adv|+}}");							
 							break;
 						default:
-							if( Util.isNotNull(entry.adv_sup) )
+							if( Util.isNotNullOrEmpty(entry.adv_sup) )
 							{
 								buffer.append(Util.LF).append( "{{inflect.en.adv|").append(entry.adv_comp).append("|").append(entry.adv_sup);								
 							}

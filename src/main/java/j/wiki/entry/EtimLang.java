@@ -24,13 +24,21 @@ public class EtimLang {
 	public Type type;
 	public String lang;		
 	public String text;
-	public String tran;
+	public String tran; // transliteration
 	
 	public EtimLang(Type type, String lang, String text)
 	{
 		this.type = type;
 		this.lang = lang;
 		this.text = text;
+	}
+
+	public EtimLang(Type type, String lang, String text, String tran)
+	{
+		this.type = type;
+		this.lang = lang;
+		this.text = text;
+		this.tran = tran;
 	}
 	
 }

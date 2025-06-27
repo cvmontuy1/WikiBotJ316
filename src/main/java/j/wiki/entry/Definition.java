@@ -36,7 +36,7 @@ public class Definition {
 	public Definition(String type, String stext)	
 	{	
 		this.type = type;
-		text = stext;
+		this.text = stext;
 		bLiteral = false;
 	
 		syns = new ArrayList<String>();		
@@ -45,7 +45,7 @@ public class Definition {
 	public Definition(String type, String stext, boolean bLiteral)	
 	{
 		this.type = type;
-		text = stext;
+		this.text = stext;
 		this.bLiteral = bLiteral;
 		
 		syns = new ArrayList<String>();		
@@ -131,7 +131,7 @@ public class Definition {
 				break;
 			case Entry.T_PLACE:
 				buffer.append(";").append(iDef).append(": ");
-				buffer.append("Nombre de varios lugares.").append(Util.LF);
+				buffer.append(text).append(Util.LF);
 				++iDef;				
 				break;
 			case Entry.T_PRESENT_3S:

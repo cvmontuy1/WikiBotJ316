@@ -18,6 +18,8 @@
  */
 package j.wiki;
 
+import java.util.List;
+
 public class Util {
 
 	public static void report(Object... objs)
@@ -63,7 +65,7 @@ public class Util {
 	}
 	
 	
-	public static boolean isNotNull(String str)
+	public static boolean isNotNullOrEmpty(String str)
 	{
 		return str != null && str.length() > 0;
 	}
@@ -94,6 +96,65 @@ public class Util {
 		}
 		return substring;
 	}	
+	
+	public static boolean isLinked(String text)
+	{
+		boolean bLinked = false;
 
+		
+		if( text != null)
+		{
+			text = text.trim();
+			bLinked = text.startsWith("[[") && text.endsWith("]]");
+		}
+		
+		return bLinked;
+	}
+	
+	public static boolean isSingleWord(String text)
+	{
+		boolean bSingle = false;
+
+		if( Util.isNotNullOrEmpty(text) )
+		{
+			text = text.trim();
+			bSingle = !text.contains(" ") && !text.contains("\t") && !text.contains(".");
+		}
+		
+		return bSingle;		
+	}
+	
+	public static String link(String text)
+	{
+		return "[[" + text + "]]";				
+	}
+
+	public static String concatenateLines(List<String> content)
+	{
+		StringBuilder buffer = new StringBuilder();
+		
+		for(String s: content)
+		{
+			buffer.append(s).append(Util.LF);
+		}
+		return buffer.toString();
+	}
+
+	public static String concatenate(List<String> content)
+	{
+		StringBuilder buffer = new StringBuilder();
+		
+		for(String s: content)
+		{
+			if( !buffer.isEmpty() )
+			{
+				buffer.append(" ");
+			}
+			buffer.append(s.trim());
+		}
+		return buffer.toString();
+	}
+	
+	
 	public final static String LF = "\r\n";
 }

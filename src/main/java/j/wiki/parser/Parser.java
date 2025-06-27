@@ -294,14 +294,15 @@ public class Parser
 	    	}	    	    	
 	    }	    
    
-	    private final static String WORDS = "([A-Za-z0-9\\-áéíóúñÑàèìòùäëïöüâêîôûæœçÆŒÇ&\\s\\,\\.\\:\\;]+)";
+	    private final static String WORDS = "([A-Za-z0-9\\-áéíóúñÑàèìòùäëïöüâêîôûæœçÁÉÍÓÚÄËÏÖÜÆŒÇ&\\s\\,\\.\\:\\;]+)";
 	    
 	    private static final Map<TokenType, Pattern> PATTERNS = new HashMap<TokenType, Pattern>();
-
+	    public static final Pattern PAT_LINK = Pattern.compile("\\[\\[" + WORDS + "(\\|" + WORDS+")?\\]\\]");
+	    
 	    static 
 	    {    
 	    	PATTERNS.put(TokenType.TEMPLATE,	Pattern.compile("\\{\\{(.+?)\\}\\}", Pattern.DOTALL));
-	    	PATTERNS.put(TokenType.LINK, 		Pattern.compile("\\[\\[" + WORDS + "\\]\\]"));
+	    	PATTERNS.put(TokenType.LINK, 		PAT_LINK);
 	    	PATTERNS.put(TokenType.TITLE,		Pattern.compile("=+" + WORDS + "=+"));
 	    	PATTERNS.put(TokenType.DEFINITION, 	Pattern.compile("^(###|##|#)", Pattern.MULTILINE));
 	    	PATTERNS.put(TokenType.BULLET,		Pattern.compile("^(\\s*\\*\\s|\\s*##?\\*\\s)", Pattern.MULTILINE));	    	

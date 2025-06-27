@@ -134,7 +134,7 @@ implements ITask
 					System.out.println("Entry:"+ strTitle );
 					System.out.println(strWikiText);
 					
-					if( bUpdateWiki && Util.isNotNull(strWikiText) )
+					if( bUpdateWiki && Util.isNotNullOrEmpty(strWikiText) )
 					{
 						if( !esExist(strTitle) )
 						{

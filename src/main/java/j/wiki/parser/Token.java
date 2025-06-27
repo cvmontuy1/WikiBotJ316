@@ -20,6 +20,7 @@ package j.wiki.parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import j.wiki.Util;
 
@@ -39,6 +40,7 @@ public class Token {
         this.startPos = startPos;
         this.endPos = endPos;
         this.children = new ArrayList<>();
+        fixValue();
     }
 
     // Getters and setters
@@ -49,6 +51,7 @@ public class Token {
     public int getStartPos() { return startPos; }
     public int getEndPos() { return endPos; }
     
+    public int getLevel()	{ return level; }
     public void setLevel(int level) { this.level = level; }
     public void setType(TokenType type) { this.type = type; }
     
@@ -66,20 +69,71 @@ public class Token {
     	}
     	else
     	{
-    		this.value = this.value + " " + value.trim();
+    		if( this.value.endsWith("|") )
+    		{
+    			this.value = this.value + value.trim();
+    		}
+    		else
+    		{
+    			this.value = this.value + " " + value.trim();
+    		}
     	}
+    }
+    
+    public boolean hasChildren()
+    {
+    	return children != null && children.size() > 0;
     }
     
     public Token getLastChildren()
     {
     	Token child = null;
     	
-    	if( children != null && children.size() > 0)
+    	if( hasChildren() )
     	{
-    		child = children.get(children.size()-1);
+    		child = children.get(children.size()-1);    		
     	}
     		
     	return child;
+    }
+    
+    public Token getLastChildrenDeep()
+    {
+    	Token child = null;
+    	Token grandson;
+
+    	child = getLastChildren();
+    	if( child != null && child.hasChildren() )
+    	{
+    		grandson = child.getLastChildren();
+    		if( grandson != null)
+    		{
+    			child = grandson;
+    		}
+    	}
+    	
+    	return child;
+    }
+
+    
+    
+    public Token getLastChildren(TokenType type)
+    {
+    	Token child = null;
+    	
+    	if( children != null && children.size() > 0)
+    	{
+    		for(int i=children.size()-1;i>=0; --i ) 
+    		{
+    			child = children.get(i);
+    			if( child.getType() == type)
+    			{
+    				break;
+    			}
+    		}
+    	}
+    		
+    	return child;    	
     }
     
     public int getPrefixLen()
@@ -166,7 +220,7 @@ public class Token {
 		{
 			buffer.append(" level:").append(level);
 		}
-		if( Util.isNotNull(value))
+		if( Util.isNotNullOrEmpty(value))
 		{
 			buffer.append(" value:").append(value);
 		}
@@ -183,7 +237,46 @@ public class Token {
 //**********************************************************************************
 //PRIVATE
 	
-	private int deep()
+	private void fixValue()
+	{
+		Matcher matcher;
+		String group; 
+		boolean bLinkFound = false;
+		
+		if( type.equals(TokenType.TEMPLATE) )
+		{
+			StringBuilder resultado = new StringBuilder();			
+			 matcher = Parser.PAT_LINK.matcher(value);
+			 while (matcher.find()) 
+			 {
+				 if( matcher.groupCount() >= 3)
+				 {				
+					 group = matcher.group(3);
+					 if( group == null)
+					 {
+						 group = matcher.group(1);
+					 }
+				 }
+				 else
+				 {
+					 group = matcher.group(1);					 
+				 }
+		         matcher.appendReplacement(resultado, group);
+		         bLinkFound = true;
+			 }
+			 if( bLinkFound )
+			 {
+				 value = resultado.toString();
+			 }
+			 
+		}
+	}
+	
+	/****
+	 *  
+	 * @return the depth level in the tree
+	 */
+	private int depth()
 	{
 		Token lparent;
 		int iDeep = 0;
@@ -200,9 +293,9 @@ public class Token {
 	private String getIdent()
 	{
 		StringBuilder buffer = new StringBuilder();
-		int iDeep = deep();
+		int iDepth = depth();
 		
-		for(int i=0; i<iDeep; ++i)
+		for(int i=0; i<iDepth; ++i)
 		{
 			buffer.append("\t");
 		}
