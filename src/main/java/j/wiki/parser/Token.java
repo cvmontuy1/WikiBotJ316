@@ -245,7 +245,7 @@ public class Token {
 		
 		if( type.equals(TokenType.TEMPLATE) )
 		{
-			StringBuilder resultado = new StringBuilder();			
+			StringBuilder result = new StringBuilder();			
 			 matcher = Parser.PAT_LINK.matcher(value);
 			 while (matcher.find()) 
 			 {
@@ -261,14 +261,14 @@ public class Token {
 				 {
 					 group = matcher.group(1);					 
 				 }
-		         matcher.appendReplacement(resultado, group);
+		         matcher.appendReplacement(result, group);
 		         bLinkFound = true;
 			 }
+			 matcher.appendTail(result);			 
 			 if( bLinkFound )
 			 {
-				 value = resultado.toString();
-			 }
-			 
+				 value = result.toString();
+			 }			 
 		}
 	}
 	

@@ -151,7 +151,6 @@ public class Parser
 	        String text;
 	        char c;
 	        
-	        text = wikitext.substring(startPos, endPos);
 	        c = wikitext.charAt(startPos);
 	        while( (c == '\r' || c == '\n') && startPos < endPos-1)
 		    {
@@ -190,7 +189,8 @@ public class Parser
 	        	}
 	        	else
 	        	{
-			        if (!text.trim().isEmpty()) {
+			        if (!text.trim().isEmpty()) 
+			        {
 			            Token textToken = new Token(TokenType.TEXT, text, startPos, endPos);
 			            parentToken.addChild(textToken);
 			        }

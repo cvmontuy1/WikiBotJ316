@@ -32,23 +32,45 @@ public class Definition {
 	public boolean bNoLink;
 	public int intIdx;
 	public List<String> syns;
+	private DefContainer defcontainer;
 	
 	public Definition(String type, String stext)	
 	{	
 		this.type = type;
 		this.text = stext;
 		bLiteral = false;
+		this.defcontainer = null;
 	
 		syns = new ArrayList<String>();		
 	}
 	
 	public Definition(String type, String stext, boolean bLiteral)	
 	{
-		this.type = type;
-		this.text = stext;
-		this.bLiteral = bLiteral;
+		this(type, stext);
+		this.bLiteral = bLiteral;	
+	}
+	
+	public void setContainer(DefContainer container)
+	{
+		if( container != null)
+		{
+			this.defcontainer = container;
+			container.addDefinition(this);
+		}		
+	}
+	
+	public boolean hasDefChildren()
+	{
+		boolean bHasChildren = false;
 		
-		syns = new ArrayList<String>();		
+		if( defcontainer != null )
+		{
+			if( defcontainer.hasChildren() )
+			{
+				bHasChildren = true;
+			}
+		}
+		return bHasChildren;
 	}
 
 	

@@ -47,6 +47,8 @@ public class Entry {
 		estrans = new ArrayList<String>();
 		
 		bWikipedia = false;
+		defcontL1 = null;
+		defcontL2 = null;
 	}
 
 //*********************************************************************	
@@ -237,7 +239,10 @@ public class Entry {
 				catgram.toWiki(this, buffer);
 				for( Definition def: catgram.defs )
 				{
-					iDef = def.toWiki(buffer, iDef);				
+					if( !def.hasDefChildren() )
+					{
+						iDef = def.toWiki(buffer, iDef);
+					}
 				}
 /*		
 		==== {{sustantivo|en}} ====
@@ -321,6 +326,7 @@ public class Entry {
 	{
 		int iEtimology;
 		Template template;
+		String diminutive;		
 		
 		Entry entry = new Entry();
 		
@@ -500,7 +506,7 @@ public class Entry {
 				case TokenType.TITLE:
 					if( isEtimology(token) )
 					{
-						iEtimology = ology(token);
+						iEtimology = getTopologyId(token);
 					}
 					else if( isNoun(token.getValue()) )
 					{
@@ -513,10 +519,25 @@ public class Entry {
 					break;
 				case TokenType.DEFINITION:
 				case TokenType.BULLET:					
-					String dim = TextParser.isDiminutive(token.getValue());
-					if( Util.isNotNullOrEmpty(dim) )
+					if( token.getLevel() == 1 )
 					{
-						entry.addDim(iEtimology, dim);
+						defcontL1 = new DefContainer(null, 1);
+						defcontL2 = null;
+					}
+					else if( token.getLevel() == 2 )
+					{
+						defcontL2 = new DefContainer(defcontL1, 2);
+					}
+					diminutive = TextParser.isDiminutive(token.getValue());
+					if( Util.isNotNullOrEmpty(diminutive) )
+					{
+						entry.addDim(iEtimology, diminutive);
+					}				
+					
+					diminutive = TextParser.isDiminutive(token.getValue());
+					if( Util.isNotNullOrEmpty(diminutive) )
+					{
+						entry.addDim(iEtimology, diminutive);
 					}
 					break;
 				default:
@@ -567,7 +588,7 @@ public class Entry {
 		return bIsEtim;
 	}
 	
-	private static int ology(Token t)
+	private static int getTopologyId(Token t)
 	{
 		int iEtim = 0;
 		String words[];
@@ -725,10 +746,24 @@ public class Entry {
 	
 	private void addPlace(int iEtim, Template template)
 	{
+		StringBuilder buffer = new StringBuilder();
 		String strPlace;
-		Place place = new Place(template);
+		Definition definition;
+		Place place;
+		
+		place = new Place(template);
 		
 		strPlace = place.toWiki();
+		if( defcontL2 != null)
+		{
+			buffer.append(strPlace);
+			definition = defcontL1.getDefinition();
+			if( definition != null && Util.isNotNullOrEmpty(definition.text) )				
+			{			
+				buffer.append(", ").append(definition.text);
+			}
+			strPlace = buffer.toString();
+		}
 		if( Util.isNotNullOrEmpty(strPlace) )
 		{
 			addDefinition(iEtim, T_PLACE, strPlace);
@@ -1024,6 +1059,15 @@ public class Entry {
 				if( !bFound )
 				{
 					catgram1.addDefinition(def);
+					if( defcontL2 != null)
+					{
+						def.setContainer(defcontL2);
+					} 
+					else if( defcontL1 != null )
+					{
+						def.setContainer(defcontL1);
+					}		
+					
 					bAdded = true;
 				}
 				break;
@@ -1035,9 +1079,20 @@ public class Entry {
 			gramcat = new GramCat();
 			gramcat.addDefinition( def );
 			etimology.gramcats.add(gramcat);
+			if( defcontL2 != null)
+			{
+				def.setContainer(defcontL2);
+			} 
+			else if( defcontL1 != null )
+			{
+				def.setContainer(defcontL1);
+			}
 		}
 		return iEtim;
 	}
+	
+	private static DefContainer defcontL1;
+	private static DefContainer defcontL2;
 	
 	/***
 	 * Category types

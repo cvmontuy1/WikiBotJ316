@@ -178,7 +178,11 @@ public class Etimology {
 						{
 							buffer.append(eti.text);
 						}
-						buffer.append("|nl=s");						
+						buffer.append("|nl=s");		
+						if( Util.isNotNullOrEmpty(eti.transliteration) )
+						{
+							buffer.append("|tr=").append(eti.transliteration);
+						}
 						buffer.append(SUFIX);						
 						++iEtim;
 					}

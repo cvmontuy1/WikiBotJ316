@@ -24,7 +24,7 @@ public class EtimLang {
 	public Type type;
 	public String lang;		
 	public String text;
-	public String tran; // transliteration
+	public String transliteration; // transliteration
 	
 	public EtimLang(Type type, String lang, String text)
 	{
@@ -38,7 +38,7 @@ public class EtimLang {
 		this.type = type;
 		this.lang = lang;
 		this.text = text;
-		this.tran = tran;
+		this.transliteration = tran;
 	}
 	
 }

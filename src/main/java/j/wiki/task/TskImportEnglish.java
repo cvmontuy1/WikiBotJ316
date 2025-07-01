@@ -56,12 +56,22 @@ implements ITask
 		
 		this.es_wiki = es_wiki0;
 		this.en_wiki = en_wiki0;
+		
 		bUpdateWiki = false;
+		bOverwrite = false;
+		
 		if( args != null && args.length>3)
 		{
 			if( args[3].toUpperCase().equals("UPDATE") )
 			{
 				bUpdateWiki = true;
+			}
+			if( args.length > 4)
+			{
+				if( args[4].toUpperCase().equals("OVERWRITE") )
+				{
+					bOverwrite = true;
+				}
 			}
 		}
 	}
@@ -134,11 +144,14 @@ implements ITask
 					System.out.println("Entry:"+ strTitle );
 					System.out.println(strWikiText);
 					
-					if( bUpdateWiki && Util.isNotNullOrEmpty(strWikiText) )
+					if( bUpdateWiki )
 					{
-						if( !esExist(strTitle) )
+						if( Util.isNotNullOrEmpty(strWikiText) )
 						{
-							es_wiki.edit(strTitle, strWikiText, "Generado con base en el contenido de en.wiktionary");
+							if( !esExist(strTitle) || bOverwrite)
+							{
+								es_wiki.edit(strTitle, strWikiText, "Generado con base en el contenido de en.wiktionary");
+							}
 						}
 					}
 				}
@@ -299,6 +312,7 @@ implements ITask
 	private boolean bUpdateWiki;
 	private String strFileName;
 	private Wiki es_wiki, en_wiki;	
+	private boolean bOverwrite;
 	private static Map<String, Command> mapEntries = new HashMap<String, Command>();
 	
 }
