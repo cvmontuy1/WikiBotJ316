@@ -162,6 +162,22 @@ public class Definition {
 				buffer.append("{{forma verbo-en|").append(text).append("|3s|presente}}.").append(Util.LF);
 				++iDef;				
 				break;
+			case Entry.T_VERB_ING:
+				appendLevel4(buffer, gramcat.wikitext);				
+				buffer.append(";").append(iDef).append(": ");
+				buffer.append("{{participio|leng=en|").append(text).append("|presente}}.").append(Util.LF);
+				++iDef;				
+				break;
+			case Entry.T_VERB_ED:
+				appendLevel4(buffer, gramcat.wikitext);				
+				buffer.append(";").append(iDef).append(": ");
+				buffer.append("{{forma verbo-en|").append(text).append("|pasado}}.").append(Util.LF);
+				++iDef;
+				buffer.append(";").append(iDef).append(": ");				
+				buffer.append("{{forma verbo-en|").append(text).append("|participio}}.").append(Util.LF);			
+				++iDef;				
+				break;
+				
 			case Entry.T_SURNAME:
 				buffer.append(";").append(iDef).append(": ");
 				buffer.append("{{apellido|leng=en}}.").append(Util.LF);

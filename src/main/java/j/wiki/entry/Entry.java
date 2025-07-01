@@ -326,7 +326,8 @@ public class Entry {
 	{
 		int iEtimology;
 		Template template;
-		String diminutive;		
+		String diminutive;
+		String inf_name;
 		
 		Entry entry = new Entry();
 		
@@ -353,10 +354,20 @@ public class Entry {
 						case TEMPLATE_INFLECTION:
 							if( template.getParameter(1).equals(ENGLISH) )
 							{
-								if( template.getParameter(4).contains("s-verb-form") )
+								inf_name = template.getParameter(4);
+								if( inf_name.contains("s-verb-form") )
 								{
-									entry.addPresent3S(iEtimology, template.getParameter(2));
+									entry.addVerbForm(iEtimology, T_PRESENT_3S, template.getParameter(2));
 								}
+								else if( inf_name.equals("ing-form"))
+								{
+									entry.addVerbForm(iEtimology, T_VERB_ING, template.getParameter(2));
+								}
+								else if( inf_name.equals("ed-form"))
+								{
+									entry.addVerbForm(iEtimology, T_VERB_ED, template.getParameter(2));
+								}									
+								
 							}
 							break;
 						case TEMPLATE_IPA:
@@ -483,6 +494,8 @@ public class Entry {
 						case TEMPLATE_BOR2:		
 						case TEMPLATE_DER:
 						case TEMPLATE_INH:
+						case TEMPLATE_INH1:
+						case TEMPLATE_INH2:							
 							if( template.getParameter(1).equals(ENGLISH) )
 							{				
 								if( Util.isNotNullOrEmpty(template.getParameter("tr") ))
@@ -676,11 +689,11 @@ public class Entry {
 		addDefinition(iEtim, T_NOUN_PLURAL, strPlural);
 	}
 
-	private void addPresent3S(int iEtim, String strPlural)
+	private void addVerbForm(int iEtim, String formName, String strPlural)
 	{
-		addDefinition(iEtim, T_PRESENT_3S, strPlural);
+		addDefinition(iEtim, formName, strPlural);
 	}
-	
+
 	private void addGramCat(int iEtim, String type)
 	{
 		Etimology etimology = null;
@@ -1102,6 +1115,8 @@ public class Entry {
 	public final static String T_NOUN			= "NOUN";
 	public final static String T_ADVERB			= "ADVERB";
 	public final static String T_PRESENT_3S		= "PRESENT_3S";
+	public final static String T_VERB_ING		= "VERB_ING";	
+	public final static String T_VERB_ED		= "VERB_ED";
 	public final static String T_PLACE 			= "PLACE";
 	public final static String T_SURNAME		= "SURNAME";
 	public final static String T_GN_MALE		= "GIVEN_NAME_MALE";
@@ -1142,17 +1157,18 @@ public class Entry {
 	public final static String TEMPLATE_ADV		  = "en-adv";
 	public final static String TEMPLATE_SURNAME	  = "surname";
 	public final static String TEMPLATE_PLACE	  = "place";
-	public final static String TEMPLATE_T1		  = "t";
+	public final static String TEMPLATE_T1		  = "t";			//*** TRANSLATIONS
 	public final static String TEMPLATE_T2		  = "t+";
 	public final static String TEMPLATE_T3		  = "t-check";
 	public final static String TEMPLATE_T4		  = "t+check";
 	public final static String TEMPLATE_T5		  = "tt";
-	public final static String TEMPLATE_INITIALS  = "initialism of";
+	public final static String TEMPLATE_INITIALS  = "initialism of";	//*** ETIMOLOGIES
 	public final static String TEMPLATE_BOR1	  = "bor";
 	public final static String TEMPLATE_BOR2	  = "bor+";	
 	public final static String TEMPLATE_DER		  = "der";
 	public final static String TEMPLATE_INH		  = "inherited";
-	
+	public final static String TEMPLATE_INH1	  = "inh+";
+	public final static String TEMPLATE_INH2	  = "inh";	
 	
 	private static String LAST_L4;	
 }

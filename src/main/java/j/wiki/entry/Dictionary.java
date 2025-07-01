@@ -80,10 +80,12 @@ public class Dictionary
 		put("barangay", "barrio", MASCULINE);
 		put("borough", "distrito", MASCULINE);
 		put("city", "ciudad", FEMENINE);		
-		put("city-state", "ciudad estado", FEMENINE);		
+		put("city-state", "ciudad estado", FEMENINE);
+		put("county", "condado", MASCULINE);
 		put("community", "comunidad", FEMENINE);
 		put("ghost town", "pueblo fantasma", MASCULINE);
 		put("gulf", "golfo", MASCULINE);
+		put("hamlet", "caserio", MASCULINE);
 		put("island", "isla", FEMENINE);		
 		put("lake", "lago", MASCULINE);
 		put("locality", "localidad", FEMENINE);		
@@ -108,9 +110,12 @@ public class Dictionary
 		put("small town", "poblado", MASCULINE);
 		put("state capital", "capital estatal", FEMENINE);
 		put("state park", "parque estatal", MASCULINE);
+		put("statutory town", "pueblo", MASCULINE);
+		put("statutory city", "ciudad", MASCULINE);
 		put("town", "pueblo", MASCULINE);		
 		put("township", "municipio", MASCULINE);		
 		put("unincorporated community", "comunidad", FEMENINE);
+		put("ucomm", "comunidad", FEMENINE);
 		put("valley", "valle", MASCULINE);
 		put("village", "villa", FEMENINE);
 		put("volcano", "volcán", MASCULINE);

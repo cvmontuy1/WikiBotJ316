@@ -48,7 +48,16 @@ public class GramCat {
 	
 	public int getDefsCount()
 	{
-		return defs.size();
+		int iDefCnt = 0;
+		
+		for( Definition def: defs)
+		{
+			if(!def.hasDefChildren() )
+			{
+				++iDefCnt;
+			}
+		}
+		return iDefCnt;
 	}
 	
 	public boolean isFlexibleForm()
@@ -127,6 +136,8 @@ public class GramCat {
 
 				break;
 			case Entry.T_PRESENT_3S:
+			case Entry.T_VERB_ING:
+			case Entry.T_VERB_ED:				
 				parent = "Forma flexiva";
 				name = "Forma verbal";
 				wikitext = name;				
@@ -161,7 +172,7 @@ public class GramCat {
 		
 	public static boolean isFlexibleForm(String type)
 	{
-		return type.equals(Entry.T_NOUN_PLURAL) || type.equals(Entry.T_PRESENT_3S);	
+		return type.equals(Entry.T_NOUN_PLURAL) || type.equals(Entry.T_PRESENT_3S) || type.equals(Entry.T_VERB_ING) || type.equals(Entry.T_VERB_ED);	
 	}
 	
 	void toWiki(Entry entry, StringBuilder buffer)

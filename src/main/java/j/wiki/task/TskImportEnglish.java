@@ -46,6 +46,12 @@ import java.util.regex.Pattern;
 public class TskImportEnglish
 implements ITask
 {
+	/**
+	 * 
+	 * @param es_wiki0	Wiki connector to es.wiktionary.org
+	 * @param en_wiki0	Wiki connector to en.wiktionary.org
+	 * @param args	args[0]  User, args[1] password, args[2] file name, args[3] "UPDATE", args[4] "OVERWRITE"
+	 */
 	public TskImportEnglish(Wiki es_wiki0, Wiki en_wiki0, String[] args)
 	{
 		if( args.length < 3)
@@ -98,7 +104,7 @@ implements ITask
 		        String regex = "(\\|\\s?)";
 		        strArray = strLine.split(regex);
 
-		        if( strArray.length > 1)
+		        if( strArray.length > 0)
 		        {
 		        	cmd = new Command(strArray);
 		        	

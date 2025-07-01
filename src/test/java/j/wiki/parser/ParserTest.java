@@ -43,7 +43,9 @@ public class ParserTest {
 		
 		entry = new ParserEntry("en", "test", WIKITEXT_HANNA);
 		
-		//System.out.println(entry.toString());				
+		assertNotNull(entry.tree.find(TokenType.TITLE, "Etymology 1") );
+		assertNotNull(entry.tree.find(TokenType.TITLE, "Etymology 2") );
+		assertTrue(entry.tree.count(TokenType.DEFINITION) == 15);				
 	}
 	
 /***********************************************************}

@@ -25,18 +25,15 @@ import java.util.List;
 import j.wiki.Util;
 
 public class Command {
-	public String cmd;
 	public String entry;
 	public List<Definition> defs;
 	
 	public Command(String[] strArray)
-	{
-    	cmd = Util.trim( strArray[0] );
-    	
-    	entry = Util.trim( strArray[1] );
+	{   	
+    	entry = Util.trim( strArray[0] );
     	defs = new ArrayList<Definition>();
     	
-    	for(int i=2; i<strArray.length; ++i)
+    	for(int i=1; i<strArray.length; ++i)
     	{
     		if( Util.isNotNullOrEmpty(strArray[i]))
     		{

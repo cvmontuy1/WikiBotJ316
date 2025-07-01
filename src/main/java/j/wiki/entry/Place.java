@@ -3,6 +3,8 @@ package j.wiki.entry;
 import java.util.ArrayList;
 import java.util.List;
 
+import j.wiki.Util;
+
 public class Place {
 	
 	public Place(Template template)
@@ -56,6 +58,10 @@ public class Place {
 					break;
 				case 1:
 					buffer.append(" en ");
+					if( tname.type.equals(TYPE_COUNTY) )
+					{
+						buffer.append("el ");
+					}
 					buffer.append(tname.genrename.name);
 					break;
 				default:
@@ -120,7 +126,13 @@ public class Place {
 				break;					
 			case "cc":
 			case "co":
-				typename.type = "condado";
+				typename.type = TYPE_COUNTY;
+				if( Util.isNotNullOrEmpty(typename.name) )
+				{
+					typename.name = typename.name.replace("county", "");
+					typename.name = typename.name.replace("County", "");
+					typename.name = "condado de " + typename.name.trim();
+				}
 				break;					
 			case "cont":
 				typename.type = "continente";
@@ -164,7 +176,7 @@ public class Place {
 		}
 	}
 	
-
+	private final static String TYPE_COUNTY = "county";
 	private Template template;
 	private List<TypeName> names;	
 }

@@ -43,6 +43,10 @@ public class Pron {
 		addApi(strApi);
 	}
 	
+	/**
+	 * Adds an alfhabet phonetic international 
+	 * @param strApi
+	 */
 	public void addApi(String strApi)
 	{
 		String[] apis;

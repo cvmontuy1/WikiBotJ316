@@ -31,10 +31,12 @@ import java.util.logging.LogManager;
 import org.wikipedia.Wiki;
 
 /**
- * Project version: 1.1d
+ * Project version: 1.1e
  * Main program
  * Executes a task
  * @author CarlosVM
+ * TODOS: 
+ * 		Fix alphabet phonetic int // or []
  */
 public class Bot {
 	final static String ES_DOMAIN = "es.wiktionary.org";
@@ -49,7 +51,7 @@ public class Bot {
 	
 	/**
 	 * Program entry point
-	 * @param args :  user password filepath UPDATE
+	 * @param args :  user password filepath UPDATE OVERWRITE
 	 * If UPDATE is not present it does not changes anything 
 	 */
 	public static void main(String[] args)

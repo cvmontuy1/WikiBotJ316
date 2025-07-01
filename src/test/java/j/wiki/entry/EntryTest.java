@@ -16,11 +16,12 @@ public class EntryTest {
 		Entry entry;
 		ParserEntry pentry = new ParserEntry("en", "Charly", ParserTest.WIKITEXT_CHARLY);	
 		entry = Entry.buildEntry("", pentry);
+
+		System.out.println(entry.toWiki());
 		
-		assertTrue(entry.getDefsCount()==5);
+		assertTrue(entry.getDefsCount()== 3);
 		assertTrue(entry.getEtimCount() == 1);
 
-		//System.out.println(entry.toWiki());
 	}	
 
 	@Test
@@ -59,10 +60,10 @@ public class EntryTest {
 		ParserEntry pentry = new ParserEntry("en", "Hanna", ParserTest.WIKITEXT_HANNA);	
 		entry = Entry.buildEntry("", pentry);
 		
-		System.out.println(pentry.toString());
-		System.out.println(entry.toWiki());
+//		System.out.println(entry.toWiki());
 		
-		assertTrue(entry.getEtimCount()==2);		
+		assertTrue(entry.getEtimCount()==2);	
+		assertTrue(entry.getDefsCount()==13);
 	}
 
 	
