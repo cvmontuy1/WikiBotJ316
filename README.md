@@ -4,13 +4,7 @@ it will be created automatically.
 
 Version 1.1.e supports importing the following types of content:
 
-Given names
-Family names
-Place names
-Plural forms
-Verbs ending in -ing
-Verbs ending in -ed
-Initials
+Given names, Family names, Place names, Plural forms, Verbs ending in -ing, Verbs ending in -ed, Initials
 
 Dependencies:
 Uses the wiki-java library:
