@@ -57,12 +57,12 @@ public class Command {
 			words = strValue.split("=");
 			for(int i=0; i<words.length; ++i)
 			{
-				words[0] = words[0].trim();				                      
+				words[i] = words[i].trim();				                      
 			}
-			catidx = Entry.getCategory(words[0]);
+			catidx = new CategoryIdx(words[0]);
 			if( catidx != null)
 			{
-				def = new Definition(catidx.type, words[1], true);
+				def = new Definition(catidx.subtype, words[1], true);
 				def.intIdx = catidx.idx;
 				defs.add(def);
 			}

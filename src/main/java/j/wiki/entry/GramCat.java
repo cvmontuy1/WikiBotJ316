@@ -1,213 +1,140 @@
-/*
- * This file is part of WikiBotJ316.
- *
- * WikiBotJ316 is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * WikiBotJ316 is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with WikiBotJ316. If not, see <https://www.gnu.org/licenses/>.
- * 
- * Author: Carlos Valenzuela Montuy
- */
 package j.wiki.entry;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import j.wiki.Util;
 
 public class GramCat {
-	public String type;
+	public Subtype subtype;
+	public Type type;
 	public String name;
 	public String wikitext;
 	public String parent;		// Flexible form
+	
+	private static Map<GramCat.Subtype, GramCat> map = new HashMap<GramCat.Subtype, GramCat>();
 
-	public List<Definition> defs;
-	
-	public GramCat()
+	public static GramCat build(Subtype subtype)
 	{
-		defs = new ArrayList<Definition>();
-		name = null;
-		wikitext = null;
-		parent = null;
-	}
-	
-	public static GramCat build(String type)
-	{
-		GramCat gramcat = new GramCat();
-		gramcat.setCategoryTitles(type);
+		GramCat gramcat;
+		
+		gramcat = map.get(subtype);
+		if( gramcat == null )
+		{
+			gramcat = new GramCat();
+			gramcat.parent = null;
+			gramcat.subtype = subtype;
+		
+			switch(subtype)
+			{
+				case NOUN_PLURAL:
+					gramcat.parent = "Forma flexiva";
+					gramcat.name = "Forma sustantiva";
+					gramcat.wikitext = gramcat.name;
+					gramcat.type = Type.INFLECTION;
+					break;
+				case VERB_3S:
+				case VERB_ING:
+				case VERB_ED:				
+					gramcat.parent = "Forma flexiva";
+					gramcat.name = "Forma verbal";
+					gramcat.wikitext = gramcat.name;	
+					gramcat.type = Type.INFLECTION;
+					break;
+				case NOUN_PROPER:
+				case PLACE:
+				case SURNAME:
+				case GN_MALE:
+				case GN_FEMALE:
+				case GN_UNISEX:			
+				case GN_DIMINUTIVE:
+					gramcat.name = "Sustantivo propio";
+					gramcat.wikitext = "{{sustantivo propio|en}}";
+					gramcat.type = Type.NOUN_PROPER;
+					
+					break;
+				case ADVERB:
+					gramcat.name = "Adverbio";
+					gramcat.wikitext = "{{adverbio|en}}";
+					gramcat.type = Type.ADVERB;
+					break;
+				case NOUN:
+					gramcat.name = "Sustantivo";
+					gramcat.wikitext = "{{sustantivo|en}}";
+					gramcat.type = Type.NOUN;
+					break;
+				default:
+					Util.reportError("Missing category for type:", subtype);
+					break;
+					
+			} // end swith
+			map.put(subtype, gramcat);
+		}
 		return gramcat;
 	}
 	
-	public int getDefsCount()
-	{
-		int iDefCnt = 0;
-		
-		for( Definition def: defs)
-		{
-			if(!def.hasDefChildren() )
-			{
-				++iDefCnt;
-			}
-		}
-		return iDefCnt;
+	public boolean isTypeEquals(Subtype subtype)
+	{	
+		return type == build(subtype).type;		
 	}
 	
+	public static Subtype getSubytype(String value)
+	{
+		Subtype subtype;
+		if( value != null )
+		{
+			value = value.toLowerCase();
+		}
+		
+		switch(value)
+		{
+			case "noun":
+				subtype = Subtype.NOUN;
+				break;
+			case "adverb":
+				subtype = Subtype.ADVERB;
+				break;
+			case "verb":
+				subtype = Subtype.VERB;
+				break;
+			case "proper noun":
+				subtype = Subtype.NOUN_PROPER;
+				break;				
+			default:
+				subtype = null;
+				Util.reportError("Invalid subtype ", value);
+				break;
+		}
+		return subtype;
+	}
+
 	public boolean isFlexibleForm()
 	{
 		return parent != null;
 	}	
 	
-	public void addDefinition(Definition def)
-	{
-		boolean bFound = false;
-		
-		for(Definition def0: defs)
-		{
-			if( def0.equals(def) )
-			{
-				bFound = true;
-			}
-		}
-		if( !bFound )
-		{
-			defs.add(def);
-			def.setGramCat(this);
-		}
-		
-		if( name == null)
-		{
-			setCategoryTitles(def.type);
-		}
+	public enum Type {
+		NOUN,
+		ADVERB,
+		NOUN_PROPER,
+		INFLECTION,
 	}
 	
-	public void addSyn(String strSyn)
+	public enum Subtype 
 	{
-		
-		if( defs.size() > 0)
-		{
-			defs.get(defs.size()-1).addSyn(strSyn);
-		}
-	}
-	
-	public boolean canContain(String type)
-	{
-		boolean bCan = false;
-		GramCat catEntry;
-		
-		if( this.type == null)
-		{
-			bCan = true;
-		}
-		else
-		{
-			catEntry = GramCat.build(type);
-			if( this.type.equals(catEntry.type) )
-			{
-				bCan = true;
-			}
-			else if( isFlexibleForm() && catEntry.isFlexibleForm() )
-			{
-				bCan = true;
-			}
-		}
-		
-		return bCan;
-	}
-	
-	public void setCategoryTitles(String type)
-	{
-		parent = null;
-		this.type = type;
-		
-		switch(type)
-		{
-			case Entry.T_NOUN_PLURAL:
-				parent = "Forma flexiva";
-				name = "Forma sustantiva";
-				wikitext = name;
-
-				break;
-			case Entry.T_PRESENT_3S:
-			case Entry.T_VERB_ING:
-			case Entry.T_VERB_ED:				
-				parent = "Forma flexiva";
-				name = "Forma verbal";
-				wikitext = name;				
-				break;
-			case Entry.T_NOUN_PROPER:
-			case Entry.T_PLACE:
-			case Entry.T_SURNAME:
-			case Entry.T_GN_MALE:
-			case Entry.T_GN_FEMALE:
-			case Entry.T_UNISEX1:
-			case Entry.T_UNISEX2:				
-			case Entry.T_GN_DIM:
-				name = "Sustantivo propio";
-				wikitext = "{{sustantivo propio|en}}";
-				this.type = Entry.T_NOUN_PROPER;
-				
-				break;
-			case Entry.T_ADVERB:
-				name = "Adverbio";
-				wikitext = "{{adverbio|en}}";				
-				break;
-			case Entry.T_NOUN:
-				name = "Sustantivo";
-				wikitext = "{{sustantivo|en}}";
-				break;
-			default:
-				Util.reportError("Missing category for type:", type);
-				break;
-				
-		}	
-	}		
-		
-	public static boolean isFlexibleForm(String type)
-	{
-		return type.equals(Entry.T_NOUN_PLURAL) || type.equals(Entry.T_PRESENT_3S) || type.equals(Entry.T_VERB_ING) || type.equals(Entry.T_VERB_ED);	
-	}
-	
-	void toWiki(Entry entry, StringBuilder buffer)
-	{
-		buffer.append(Util.LF);
-		if( parent != null)
-		{
-			buffer.append(Entry.IDENT3).append(" ").append(parent).append(" ").append(Entry.IDENT3);
-		}
-		else
-		{
-			buffer.append(Entry.IDENT4).append(" ").append(wikitext).append(" ").append(Entry.IDENT4);
-			if( type.equalsIgnoreCase( Entry.T_ADVERB ) )
-			{
-				if( Util.isNotNullOrEmpty(entry.adv_comp) )
-				{
-					switch(entry.adv_comp)
-					{
-						case "-":
-							buffer.append(Util.LF).append( "{{inflect.en.adv|-}}");
-							break;
-						case "+":
-							buffer.append(Util.LF).append( "{{inflect.en.adv|+}}");							
-							break;
-						default:
-							if( Util.isNotNullOrEmpty(entry.adv_sup) )
-							{
-								buffer.append(Util.LF).append( "{{inflect.en.adv|").append(entry.adv_comp).append("|").append(entry.adv_sup);								
-							}
-							break;
-					}
-				}
-			}
-		}
-		
-		buffer.append(Util.LF);
+		NOUN,
+		VERB,
+		ADVERB,
+		NOUN_PROPER,
+		NOUN_PLURAL,
+		VERB_3S,
+		VERB_ING,
+		VERB_ED,
+		PLACE,
+		SURNAME,		
+		GN_MALE,		// male given name 
+		GN_FEMALE,		// female given name
+		GN_UNISEX,		// unisex given name
+		GN_DIMINUTIVE,	// diminutive given name		
 	}
 }

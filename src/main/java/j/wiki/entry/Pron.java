@@ -72,4 +72,47 @@ public class Pron {
 	{
 		audios.add(strAudio);
 	}
+	
+	public String getIPAType(int i)
+	{
+		String strValue = ipas.get(i);
+		String type;
+		if( strValue.startsWith("/") )
+		{
+			type = "fono";
+		}
+		else
+		{
+			type = "fone";
+		}
+		return type;
+	}
+	
+	public String getIPAValue(int i)
+	{
+		String ipa = ipas.get(i);
+		return ipa.substring(1, ipa.length()-1);
+	}
+	
+	public String getPronName()
+	{
+		String pronname = null;
+		
+		switch(name)
+		{
+			case Constants.UK:
+				pronname = "Reino Unido";
+				break;
+			case Constants.US:
+				pronname = "Estados Unidos";
+				break;
+			case Constants.AU:
+				pronname = "Australia";
+				break;
+			case Constants.CA:
+				pronname = "Canadá";
+				break;			
+		}
+		return pronname;
+	}
 }

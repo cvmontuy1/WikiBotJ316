@@ -25,20 +25,50 @@ import j.wiki.Util;
  * Grammar category and index
  */
 public class CategoryIdx {
-	public String type;
+	public GramCat.Subtype subtype;
 	public int idx;
 	
-	public CategoryIdx(String strType, String strValue)
+	public CategoryIdx(String strValue)
 	{
-		type = strType;
+		char[] chars = strValue.toCharArray();
+		int iChar;
+		boolean bFound;
+		String strSubtype;
+		String strIdx;
+		
+		iChar = 0;
+		bFound = false;
+		for( char c: chars)
+		{
+			if( Character.isDigit(c) )
+			{
+				bFound = true;
+				break;
+			}
+			++iChar;
+		}
+		
+		if( bFound )
+		{
+			strSubtype = strValue.substring(0, iChar);
+			strIdx = strValue.substring(iChar);
+		}
+		else
+		{
+			strSubtype = strValue.trim();
+			strIdx = "0";
+		}
+		
 		try
 		{
-			idx = Integer.parseInt(strValue.substring(strType.length()));
+
+			subtype = GramCat.getSubytype(strSubtype);			
+			idx = Integer.parseInt(strIdx);
 		}
 		catch(Exception ex)
 		{
 			idx = 0;
-			Util.reportError(ex, "CategoryIdx invalid number");
+			Util.reportError(ex, "CategoryIdx invalid", strValue);
 		}
 	}
 	

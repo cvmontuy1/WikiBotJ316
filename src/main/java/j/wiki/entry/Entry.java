@@ -46,9 +46,10 @@ public class Entry {
 		homophons = new ArrayList<String>();
 		estrans = new ArrayList<String>();
 		
+		defcontL1	= null;
+		defcontL2	= null;
+
 		bWikipedia = false;
-		defcontL1 = null;
-		defcontL2 = null;
 	}
 
 //*********************************************************************	
@@ -77,6 +78,11 @@ public class Entry {
 			iCount = iCount + e.getDefsCount();
 		}
 		return iCount;		
+	}
+	
+	public int getPronCount()
+	{
+		return prons.size();
 	}
 	
 	public int getEtimCount()
@@ -113,7 +119,28 @@ public class Entry {
 			}
 		}
 		return bHas;
-	}	
+	}
+	
+	public String getDefTxt(int iDef)
+	{
+		String strDef = "";
+		
+		if( iDef > 0)
+		{
+			--iDef;
+		}
+		for(Etimology etimology: etims)
+		{
+			if( etimology.getDefsCount() > iDef)
+			{
+				strDef = etimology.getDefTxt(iDef);
+				break;
+			}
+			iDef = iDef - etimology.getDefsCount();
+		}
+		
+		return strDef;
+	}
 
 	/**
 	 * Generates wiki content
@@ -122,44 +149,41 @@ public class Entry {
 	public String toWiki()
 	{
 		StringBuilder buffer = new StringBuilder();
-		int iPron, iAudio, iAPI, iDef;
-		
+		int iPron, iAudio, iDef;
 	
 		buffer.append("{{creado_por_bot}}").append(Util.LF);
 		buffer.append("{{desambiguación|}}").append(Util.LF);
-		buffer.append(IDENT2).append(" {{lengua|en}} ").append(IDENT2).append(Util.LF);
+		buffer.append(Constants.IDENT2).append(" {{lengua|en}} ").append(Constants.IDENT2).append(Util.LF);
 		buffer.append("{{pron-graf|leng=en");
 		
 		iPron = 0;		
 		for(Pron pron: prons)
 		{
-			iAPI = 0;
-			for(String ipa: pron.ipas)
+			for(int iIPA = 0; iIPA<pron.ipas.size(); ++iIPA)
 			{
 				if( iPron == 0 )
 				{
-					if( iAPI == 0)
+					if( iIPA == 0)
 					{
-						buffer.append(Util.LF).append("|").append("fono=");
+						buffer.append(Util.LF).append("|").append(pron.getIPAType(iIPA)).append("=");
 					}
 					else
 					{
-						buffer.append("|").append("fono").append(iAPI+1).append("=");					
+						buffer.append("|").append(pron.getIPAType(iIPA)).append(iIPA+1).append("=");					
 					}
 				}
 				else
 				{
-					if( iAPI == 0)
+					if( iIPA == 0)
 					{
-						buffer.append(Util.LF).append("|").append(iPron+1).append("fono=");
+						buffer.append(Util.LF).append("|").append(iPron+1).append(pron.getIPAType(iIPA)).append("=");
 					}
 					else
 					{
-						buffer.append("|").append(iPron+1).append("fono").append(iAPI+1).append("=");					
+						buffer.append("|").append(iPron+1).append(pron.getIPAType(iIPA)).append(iIPA+1).append("=");					
 					}					
 				}
-				buffer.append(ipa);
-				++iAPI;
+				buffer.append(pron.getIPAValue(iIPA));
 			}
 			iAudio = 0;
 			for(String audio: pron.audios)
@@ -192,25 +216,17 @@ public class Entry {
 			}
 			if( iPron == 0)
 			{
-				if( pron.name.equals(UK) )
+				if( Util.isNotNullOrEmpty(pron.name) )
 				{
-					buffer.append("|pron=Reino Unido");
-				}
-				else if( pron.name.equals(US))
-				{
-					buffer.append("|pron=Estados Unidos");
+					buffer.append("|pron=").append(pron.getPronName());
 				}
 			}
 			else
-			{	
-				if( pron.name.equals(UK) )
+			{
+				if( Util.isNotNullOrEmpty(pron.name) )
 				{
-					buffer.append("|").append(iPron+1).append("pron=Reino Unido");
-				}
-				else if( pron.name.equals(US))
-				{
-					buffer.append("|").append(iPron+1).append("pron=Estados Unidos");
-				}
+					buffer.append("|").append(iPron+1).append("pron=").append(pron.getPronName());
+				}				
 			}
 			++iPron;
 		}
@@ -224,17 +240,17 @@ public class Entry {
 				if( etimology.iEtim == 0)
 				{
 					buffer.append(Util.LF);
-					buffer.append(IDENT3).append(" Etimología ").append(IDENT3).append(Util.LF);;				
+					buffer.append(Constants.IDENT3).append(" Etimología ").append(Constants.IDENT3).append(Util.LF);				
 				}
 				else
 				{
 					buffer.append(Util.LF);					
-					buffer.append(IDENT3).append(" Etimología ").append(etimology.iEtim).append(IDENT3).append(Util.LF);
+					buffer.append(Constants.IDENT3).append(" Etimología ").append(etimology.iEtim).append(Constants.IDENT3).append(Util.LF);
 				}
 				etimology.toWiki(buffer);
 			}
 
-			for(GramCat catgram : etimology.gramcats)
+			for(GramCatContainer catgram : etimology.gc_conts)
 			{
 				catgram.toWiki(this, buffer);
 				for( Definition def: catgram.defs )
@@ -244,22 +260,7 @@ public class Entry {
 						iDef = def.toWiki(buffer, iDef);
 					}
 				}
-/*		
-		==== {{sustantivo|en}} ====
-		{{inflect.en.sust.nocontable}}
-		{{inflect.en.sust.nocontable}}
-		{{inflect.en.sust.reg}}
-		{{inflect.en.sust.sg-pl||}}
-		;1: {{plm|}}, [[]], [[]].
-*/
 			}
-/*
-	  		==== Locuciones ====
-	 
-			{{trad-arriba|Locuciones}}
-			* {{l|en|}}
-			{{trad-abajo}}
-*/
 		}
 		
 		if( bWikipedia )
@@ -276,36 +277,7 @@ public class Entry {
 		return buffer.toString();
 	}
 	
-	public static CategoryIdx getCategory(String strCat)
-	{
-		CategoryIdx catidx = null;
-		
-		strCat = strCat.toUpperCase();
-		
-		if( strCat.startsWith(T_NOUN_PLURAL) )
-		{
-			catidx = new CategoryIdx(T_NOUN_PLURAL, strCat);
-		}
-		else if( strCat.startsWith(T_NOUN_PROPER) )
-		{
-			catidx = new CategoryIdx(T_NOUN_PROPER, strCat);
-		}
-		else if( strCat.startsWith(T_NOUN) )
-		{
-			catidx = new CategoryIdx(T_NOUN, strCat);			
-		}
-		else if( strCat.startsWith(T_ADVERB) )
-		{
-			catidx = new CategoryIdx(T_ADVERB, strCat);
-		}
-		
-		if( catidx == null)
-		{
-			Util.reportError("Unknown categoy:", strCat);
-		}
-		return catidx;
-	}
-	
+
 	public static void clear()
 	{
 		LAST_L4 = "";
@@ -321,334 +293,161 @@ public class Entry {
 		LAST_L4 = str;
 	}
 	
-
-	public static Entry buildEntry(String strTitle, ParserEntry pentry)
+	public void addNounPlural(int iEtim, String strPlural)
 	{
-		int iEtimology;
-		Template template;
-		String diminutive;
-		String inf_name;
-		
-		Entry entry = new Entry();
-		
-		entry.lang = "en";
-		entry.entry = strTitle;
-		
-		
-		iEtimology = 0;
-		for(Token token : pentry.getChildren())
-		{
+		addDefinition(iEtim, GramCat.Subtype.NOUN_PLURAL, strPlural);
+	}
 
-			switch(token.getType())
+	public void addVerbForm(int iEtim, GramCat.Subtype subtype, String strPlural)
+	{
+		addDefinition(iEtim, subtype, strPlural);
+	}
+
+	
+	public void addDim(int iEtim, String strName)
+	{
+		List<String> words = TextParser.filter(strName);
+		for( String name: words)
+		{
+			if( Util.isNotNullOrEmpty(name))
 			{
-				case TokenType.TEMPLATE:
-					template = new Template(token);
-					switch(template.getName())
-					{
-						case TEMPLATE_PLURAL:
-							if( template.getParameter(1).equals(ENGLISH) )
-							{
-								entry.addNounPlural(iEtimology, template.getParameter(2));
-							}
-							break;
-						case TEMPLATE_INFLECTION:
-							if( template.getParameter(1).equals(ENGLISH) )
-							{
-								inf_name = template.getParameter(4);
-								if( inf_name.contains("s-verb-form") )
-								{
-									entry.addVerbForm(iEtimology, T_PRESENT_3S, template.getParameter(2));
-								}
-								else if( inf_name.equals("ing-form"))
-								{
-									entry.addVerbForm(iEtimology, T_VERB_ING, template.getParameter(2));
-								}
-								else if( inf_name.equals("ed-form"))
-								{
-									entry.addVerbForm(iEtimology, T_VERB_ED, template.getParameter(2));
-								}									
-								
-							}
-							break;
-						case TEMPLATE_IPA:
-							if( template.getParameter(1).equals(ENGLISH) )
-							{							
-								if( template.containsParameter("a") )
-								{
-									if( isIPA_US(template.getParameter("a") ) ) 
-									{
-										entry.addAPI(Entry.US, template.getParameter(2));
-									}
-									if( isIPA_UK(template.getParameter("a")))
-									{
-										entry.addAPI(Entry.UK, template.getParameter(2));
-									}
-								}
-								else
-								{
-									entry.addAPI(Entry.GE, template.getParameter(2));
-								}
-							}
-							break;
-						case TEMPLATE_AUDIO:
-							if( template.getParameter(1).equals(ENGLISH) )
-							{							
-								if( template.containsParameter("a") )
-								{
-									if( isIPA_US(template.getParameter("a") ) ) 
-									{
-										entry.addAudio(Entry.US, template.getParameter(2));
-									}
-									else if( isIPA_UK(template.getParameter("a")))
-									{
-										entry.addAudio(Entry.UK, template.getParameter(2));
-									}									
-								}
-							}
-							break;
-						case TEMPLATE_WIKIPEDIA1:
-							if( template.getUnnamedParsCnt() > 0 )
-							{
-								if( template.getParameter(1).equals("Wikipedia") )
-								{
-									entry.setWikipedia();
-								}
-							}
-							else
-							{
-								entry.setWikipedia();								
-							}
-							break;
-						case TEMPLATE_WIKIPEDIA2:
-							entry.setWikipedia();
-							break;
-						case TEMPLATE_DIMINUTIVE:
-							if( template.getParameter(1).equals(ENGLISH) )
-							{
-								entry.addDim(iEtimology, template.getParameter(2));
-							}
-							break;
-						case TEMPLATE_GIVENNAME:
-							if( template.containsParameter("dimof") )
-							{
-								entry.addDim(iEtimology, template.getParameter("dimof"));
-							}
-							else if ( template.containsParameter("dim") )
-							{
-								entry.addDim(iEtimology, template.getParameter("dim"));
-							}
-							else if( template.containsParameter("gender") )
-							{
-								entry.addGivenName(iEtimology, template.getParameter("gender"));	
-							}
-							else 
-							{
-								entry.addGivenName(iEtimology, template.getParameter(2));
-							}
-							break;
-						case TEMPLATE_HOMOPHONE:
-							if( template.getParameter(1).equals(ENGLISH) )
-							{
-								for(int i=1; i<=template.getUnnamedParsCnt(); ++i)
-								{
-									entry.addHomophon(template.getParameter(i));
-								}
-							}
-							break;
-						case TEMPLATE_SYN1:
-						case TEMPLATE_SYN2:
-							if( template.getParameter(1).equals(ENGLISH) )
-							{
-								for(int i=1; i<=template.getUnnamedParsCnt(); ++i)
-								{
-									entry.addSyn(iEtimology, template.getParameter(i));
-								}								
-							}
-							break;
-						case TEMPLATE_ADV:
-							entry.addAdv(iEtimology, template.getParameter(1), template.getParameter(2));
-							break;
-						case TEMPLATE_SURNAME:
-							entry.addSurname(iEtimology);
-							break;
-						case TEMPLATE_PLACE:
-							if( template.getParameter(1).equals(ENGLISH) )
-							{
-								entry.addPlace(iEtimology, template);			
-							}
-							break;
-						case TEMPLATE_T1:	// Translations
-						case TEMPLATE_T2:
-						case TEMPLATE_T3:
-						case TEMPLATE_T4:
-						case TEMPLATE_T5:
-							if( template.getParameter(1).equals(SPANISH) )
-							{
-								for(int i=2; i<=template.getUnnamedParsCnt(); ++i)
-								{
-									entry.addEsTrans(template.getParameter(i));
-								}
-							}
-							break;
-						case TEMPLATE_BOR1:
-						case TEMPLATE_BOR2:		
-						case TEMPLATE_DER:
-						case TEMPLATE_INH:
-						case TEMPLATE_INH1:
-						case TEMPLATE_INH2:							
-							if( template.getParameter(1).equals(ENGLISH) )
-							{				
-								if( Util.isNotNullOrEmpty(template.getParameter("tr") ))
-								{
-									entry.addEtimology(iEtimology, EtimLang.Type.BORROWED, template.getParameter(2), template.getParameter(3), template.getParameter("tr"));
-								}
-								else
-								{
-									entry.addEtimology(iEtimology, EtimLang.Type.BORROWED, template.getParameter(2), template.getParameter(3), null);
-								}
-							}
-							break;
-						case TEMPLATE_INITIALS:
-							if( template.getParameter(1).equals(ENGLISH) )
-							{
-								entry.addInitials(template.getParameter(2));
-							}
-							break;
-					}
-					break;
-				case TokenType.TITLE:
-					if( isEtimology(token) )
-					{
-						iEtimology = getTopologyId(token);
-					}
-					else if( isNoun(token.getValue()) )
-					{
-						entry.addGramCat(iEtimology, T_NOUN);
-					}
-					else if( isProperNoun(token.getValue()) )
-					{
-						entry.addGramCat(iEtimology, T_NOUN_PROPER);
-					}
-					break;
-				case TokenType.DEFINITION:
-				case TokenType.BULLET:					
-					if( token.getLevel() == 1 )
-					{
-						defcontL1 = new DefContainer(null, 1);
-						defcontL2 = null;
-					}
-					else if( token.getLevel() == 2 )
-					{
-						defcontL2 = new DefContainer(defcontL1, 2);
-					}
-					diminutive = TextParser.isDiminutive(token.getValue());
-					if( Util.isNotNullOrEmpty(diminutive) )
-					{
-						entry.addDim(iEtimology, diminutive);
-					}				
-					
-					diminutive = TextParser.isDiminutive(token.getValue());
-					if( Util.isNotNullOrEmpty(diminutive) )
-					{
-						entry.addDim(iEtimology, diminutive);
-					}
-					break;
-				default:
-						// Ignored tokens
-			}			
+				addDefinition(iEtim, GramCat.Subtype.GN_DIMINUTIVE, name);
+			}
+		}
+	}
+	
+	public void addGramCat(int iEtim, GramCat.Subtype subtype)
+	{
+		Etimology etimology = null;
+		GramCatContainer gc_container;		
+		boolean bFound;
+		
+		while(etimology == null)
+		{
+			if( etims.size() <= iEtim )
+			{
+				int iSize = etims.size();
+				for(int i= iSize;  i<iEtim+1; ++i )
+				{				
+					etims.add(new Etimology(i) );
+				}
+			}				
+			
+			etimology = etims.get(iEtim);
+			if( !GramCatContainer.isFlexibleForm(subtype) && etimology.hasFlexibleForm() )
+			{
+				etimology = null;
+				++iEtim;
+			}
 		}
 		
-		entry.prepareWiki();
+		bFound = false;
+		for(GramCatContainer gc_cont: etimology.gc_conts)
+		{
+			if( gc_cont.isTypeEquals(subtype) )
+			{
+				bFound = true;
+				break;
+			}
+		}
 		
-		return entry;
-	}
-	
-	
-//*********************************************************
-// PRIVATE SECTOIN	
-	
-	private static boolean isNoun(String noun)
-	{
-		return noun.equals(NOUN);
-	}
-	
-	private static boolean isProperNoun(String noun)
-	{
-		return noun.equals(PROPER_NOUN);
-	}
-
-	private static boolean isIPA_US(String value)
-	{
-		return  value.contains("US") ||
-				value.contains("GA") ||
-				value.contains("United States");
-	}
-	
-	private static boolean isIPA_UK(String value)
-	{
-		return value.contains("UK") ||
-			   value.contains("England");
+		if( !bFound)
+		{
+			gc_container = GramCatContainer.build(subtype);
+			etimology.gc_conts.add(gc_container);
+		}
 				
 	}
 	
-	private static boolean isEtimology(Token t)
+	public void addGivenName(int iEtim, String strName)
 	{
-		boolean bIsEtim = false;
-		if( t.getType() == TokenType.TITLE)
+		if( strName.equals(Constants.UNISEX1) || strName.equals(Constants.UNISEX2) )
 		{
-			bIsEtim = t.getValue().contains("Etymology");
+			addDefinition(iEtim, GramCat.Subtype.GN_UNISEX, "");
 		}
-		return bIsEtim;
-	}
-	
-	private static int getTopologyId(Token t)
-	{
-		int iEtim = 0;
-		String words[];
-		
-		try
+		else
 		{
-			words = t.getValue().split("\\s");
-			if( words != null && words.length >= 2 )
+			if( strName.equals(Constants.MALE) )
 			{
-				try
-				{
-					iEtim = Integer.parseInt(words[1]);
-				}
-				catch(Exception ex0)
-				{
-					Util.reportError("Invalid etimology number", t);
-				}
+				addDefinition(iEtim, GramCat.Subtype.GN_MALE, "");
+			}
+			else if( strName.equals(Constants.FEMALE) )
+			{
+				addDefinition(iEtim, GramCat.Subtype.GN_FEMALE, "");
 			}
 		}
-		catch(Exception ex)
-		{
-			
-		}
-		
-		return iEtim;
 	}
-
 	
-	private int nextEtimId()
+	public void addPlace(int iEtim, Template template)
 	{
-		int iEtim = 0;
-		for(Etimology etim: etims)
+		StringBuilder buffer = new StringBuilder();
+		String strPlace;
+		Definition definition;
+		Place place;
+		
+		place = new Place(template);
+		
+		strPlace = place.toWiki();
+		if( defcontL2 != null)
 		{
-			if( iEtim <= etim.iEtim)
+			buffer.append(strPlace);
+			definition = defcontL1.getDefinition();
+			if( definition != null && Util.isNotNullOrEmpty(definition.text) )				
+			{			
+				buffer.append(", ").append(definition.text);
+			}
+			strPlace = buffer.toString();
+		}
+		if( Util.isNotNullOrEmpty(strPlace) )
+		{
+			addDefinition(iEtim, GramCat.Subtype.PLACE, strPlace);
+		}
+	}
+	
+	public void addSurname(int iEtim)
+	{
+		addDefinition(iEtim, GramCat.Subtype.SURNAME, "");
+	}
+	
+	public void addAdv(int iEtim, String comparative, String superlative)
+	{	
+		adv_comp = comparative;
+		adv_sup = superlative;
+	}
+	
+	public void setWikipedia()
+	{
+		bWikipedia = true;
+	}
+	
+	/*
+	 * International phonetic alphabet 
+	 */
+	public void addAPI(String strCode, String ipa)
+	{
+		boolean bFound;
+		
+		bFound = false;
+		for(Pron pron: prons)
+		{
+			if( pron.name.equals(strCode) )
 			{
-				iEtim = etim.iEtim;
+				bFound = true;
+				pron.addApi(ipa);
 			}
 		}
-		return iEtim + 1;
+		if( !bFound )
+		{
+			prons.add(new Pron(strCode, ipa));
+		}
 	}
-
-	private void addEsTrans(String strTrans)
+	
+	public void addEsTrans(String strTrans)
 	{
 		estrans.add(strTrans);
 	}
 	
-	private void addAudio(String strCode, String strAudio)
+	public void addAudio(String strCode, String strAudio)
 	{
 		boolean bFound;
 		
@@ -671,130 +470,7 @@ public class Entry {
 		}		
 	}
 	
-	
-	private void addDim(int iEtim, String strName)
-	{
-		List<String> words = TextParser.filter(strName);
-		for( String name: words)
-		{
-			if( Util.isNotNullOrEmpty(name))
-			{
-				addDefinition(iEtim, T_GN_DIM, name);
-			}
-		}
-	}
-	
-	private void addNounPlural(int iEtim, String strPlural)
-	{
-		addDefinition(iEtim, T_NOUN_PLURAL, strPlural);
-	}
-
-	private void addVerbForm(int iEtim, String formName, String strPlural)
-	{
-		addDefinition(iEtim, formName, strPlural);
-	}
-
-	private void addGramCat(int iEtim, String type)
-	{
-		Etimology etimology = null;
-		GramCat gramcat;
-		boolean bFound;
-		
-		while(etimology == null)
-		{
-			if( etims.size() <= iEtim )
-			{
-				int iSize = etims.size();
-				for(int i= iSize;  i<iEtim+1; ++i )
-				{				
-					etims.add(new Etimology(i) );
-				}
-			}				
-			
-			etimology = etims.get(iEtim);
-			if( !GramCat.isFlexibleForm(type) && etimology.hasFlexibleForm() )
-			{
-				etimology = null;
-				++iEtim;
-			}
-		}
-		
-		bFound = false;
-		for(GramCat catgram1: etimology.gramcats)
-		{
-			if( catgram1.type == type )
-			{
-				bFound = true;
-				break;
-			}
-		}
-		
-		if( !bFound)
-		{
-			gramcat = GramCat.build(type);
-			etimology.gramcats.add(gramcat);
-		}
-				
-	}
-	
-	private void addGivenName(int iEtim, String strName)
-	{
-		if( strName.equals(T_UNISEX1) || strName.equals(T_UNISEX2) )
-		{
-			addDefinition(iEtim, T_GN_MALE, "");
-			addDefinition(iEtim, T_GN_FEMALE, "");
-		}
-		else
-		{
-			if( strName.equals(MALE) )
-			{
-				addDefinition(iEtim, T_GN_MALE, "");
-			}
-			else if( strName.equals(FEMALE) )
-			{
-				addDefinition(iEtim, T_GN_FEMALE, "");
-			}
-		}
-	}
-	
-	private void addPlace(int iEtim, Template template)
-	{
-		StringBuilder buffer = new StringBuilder();
-		String strPlace;
-		Definition definition;
-		Place place;
-		
-		place = new Place(template);
-		
-		strPlace = place.toWiki();
-		if( defcontL2 != null)
-		{
-			buffer.append(strPlace);
-			definition = defcontL1.getDefinition();
-			if( definition != null && Util.isNotNullOrEmpty(definition.text) )				
-			{			
-				buffer.append(", ").append(definition.text);
-			}
-			strPlace = buffer.toString();
-		}
-		if( Util.isNotNullOrEmpty(strPlace) )
-		{
-			addDefinition(iEtim, T_PLACE, strPlace);
-		}
-	}
-	
-	private void addSurname(int iEtim)
-	{
-		addDefinition(iEtim, T_SURNAME, "");
-	}
-	
-	private void addAdv(int iEtim, String comparative, String superlative)
-	{	
-		adv_comp = comparative;
-		adv_sup = superlative;
-	}
-	
-	private void addSyn(int iEtim, String strSyn)
+	public void addSyn(int iEtim, String strSyn)
 	{
 		Etimology etimology;
 		
@@ -810,36 +486,14 @@ public class Entry {
 		etimology = etims.get(iEtim);
 		etimology.addSyn(strSyn);
 	}
-	
-	private Etimology getEtimology(int i)
-	{
-		Etimology etim = null;
-		
-		for(Etimology e: etims)
-		{
-			if( e.iEtim == i)
-			{
-				etim = e;
-				break;
-			}
-		}
-		
-		if( etim == null)
-		{
-			etim = new Etimology(i);
-			etims.add(etim);
-		}
-		
-		return etim;
-	}
-	
-	private void addEtimology(int iEtim, EtimLang.Type type, String lang, String words, String transliteración)
+
+	public void addEtimology(int iEtim, EtimLang.Type type, String lang, String words, String transliteración)
 	{
 		Etimology etim = getEtimology(iEtim);
 		etim.addEtimLang(new EtimLang(type, lang, words, transliteración));
 	}
 	
-	private void addInitials(String strInitials)
+	public void addInitials(String strInitials)
 	{
 		Etimology etimology;
 		int iEtim = 0;
@@ -873,7 +527,7 @@ public class Entry {
 		}
 	}
 	
-	private void addHomophon(String strHomophone)
+	public void addHomophon(String strHomophone)
 	{
 		boolean bFound = false;
 		for(String str: homophons)
@@ -890,36 +544,56 @@ public class Entry {
 			homophons.add(strHomophone);
 		}
 	}
-	
-	private void setWikipedia()
+
+	public static boolean isEtimology(Token t)
 	{
-		bWikipedia = true;
+		boolean bIsEtim = false;
+		if( t.getType() == TokenType.TITLE)
+		{
+			bIsEtim = t.getValue().contains("Etymology");
+		}
+		return bIsEtim;
 	}
 	
-	/*
-	 * International phonetic alphabet 
-	 */
-	private void addAPI(String strCode, String ipa)
+	public static int getEtimologyId(Token t)
 	{
-		boolean bFound;
+		int iEtim = 0;
+		String words[];
 		
-		bFound = false;
-		for(Pron pron: prons)
+		try
 		{
-			if( pron.name.equals(strCode) )
+			words = t.getValue().split("\\s");
+			if( words != null && words.length >= 2 )
 			{
-				bFound = true;
-				pron.addApi(ipa);
+				try
+				{
+					iEtim = Integer.parseInt(words[1]);
+				}
+				catch(Exception ex0)
+				{
+					Util.reportError("Invalid etimology number", t);
+				}
 			}
 		}
-		if( !bFound )
+		catch(Exception ex)
 		{
-			prons.add(new Pron(strCode, ipa));
+			
 		}
+		
+		return iEtim;
+	}
+
+	public static boolean isNoun(String noun)
+	{
+		return noun.equals(Constants.NOUN);
 	}
 	
+	public static boolean isProperNoun(String noun)
+	{
+		return noun.equals(Constants.PROPER_NOUN);
+	}
 	
-	private void prepareWiki()
+	public void prepareWiki()
 	{
 		int iEtim = 0;
 		int iEtimCnt = 0;
@@ -946,7 +620,7 @@ public class Entry {
 				{
 					if( !etim.hasFlexibleForm() )
 					{
-						addDefinition(etim.iEtim, def.type, def.text, true);
+						addDefinition(etim.iEtim, def.subtype, def.text, true);
 						bAdded = true;
 						break;
 					}
@@ -955,7 +629,7 @@ public class Entry {
 				{
 					Etimology etim = new Etimology(nextEtimId());
 					etims.add(etim);					
-					addDefinition(etim.iEtim, def.type, def.text, true);
+					addDefinition(etim.iEtim, def.subtype, def.text, true);
 				}
 			}
 		}
@@ -1008,9 +682,9 @@ public class Entry {
 		
 		if( etims.size() == 1)
 		{
-			if( etims.get(0).gramcats.size() == 1 )
+			if( etims.get(0).gc_conts.size() == 1 )
 			{
-				for(Definition def : etims.get(0).gramcats.get(0).defs )
+				for(Definition def : etims.get(0).gc_conts.get(0).defs )
 				{
 					
 				}
@@ -1018,12 +692,66 @@ public class Entry {
 		}
 	}
 	
-	private void addDefinition(int iEtim, String strType, String strDef)
+	public void setDefContainer(Token token)
 	{
-		addDefinition(iEtim, strType, strDef, false);
+		switch(token.getLevel())
+		{
+			case 1:
+				defcontL1 = new DefContainer(null, token.getLevel());
+				defcontL2 = null;
+				break;
+			case 2:
+				defcontL2 = new DefContainer(defcontL1, token.getLevel());
+				break;
+		}
 	}
 	
-	private int addDefinition(int iEtim, String strType, String strDef, boolean bLiteral)
+//*********************************************************
+// PRIVATE SECTOIN	
+	
+	private int nextEtimId()
+	{
+		int iEtim = 0;
+		for(Etimology etim: etims)
+		{
+			if( iEtim <= etim.iEtim)
+			{
+				iEtim = etim.iEtim;
+			}
+		}
+		return iEtim + 1;
+	}
+
+	
+	private Etimology getEtimology(int i)
+	{
+		Etimology etim = null;
+		
+		for(Etimology e: etims)
+		{
+			if( e.iEtim == i)
+			{
+				etim = e;
+				break;
+			}
+		}
+		
+		if( etim == null)
+		{
+			etim = new Etimology(i);
+			etims.add(etim);
+		}
+		
+		return etim;
+	}
+	
+	
+	private void addDefinition(int iEtim, GramCat.Subtype subtype, String strDef)
+	{
+		addDefinition(iEtim, subtype, strDef, false);
+	}
+	
+	private int addDefinition(int iEtim, GramCat.Subtype subtype, String strDef, boolean bLiteral)
 	{
 		Etimology etimology;
 		boolean bFound = false;
@@ -1031,7 +759,7 @@ public class Entry {
 		Definition def;
 		
 		strDef = Util.trim(strDef);
-		def = new Definition(strType, strDef, bLiteral);
+		def = new Definition(subtype, strDef, bLiteral);
 		etimology = null;
 		
 		if( def.isFlexibleForm() )
@@ -1057,9 +785,9 @@ public class Entry {
 		}
 		
 		
-		for(GramCat catgram1: etimology.gramcats)
+		for(GramCatContainer catgram1: etimology.gc_conts)
 		{
-			if( catgram1.canContain(strType) )
+			if( catgram1.canContain(subtype) )
 			{
 				for(Definition def1 : catgram1.defs)
 				{
@@ -1088,10 +816,10 @@ public class Entry {
 		}
 		if( !bFound && !bAdded)
 		{
-			GramCat gramcat;
-			gramcat = new GramCat();
-			gramcat.addDefinition( def );
-			etimology.gramcats.add(gramcat);
+			GramCatContainer gc_container;
+			gc_container = new GramCatContainer();
+			gc_container.addDefinition( def );
+			etimology.add(gc_container);
 			if( defcontL2 != null)
 			{
 				def.setContainer(defcontL2);
@@ -1103,72 +831,9 @@ public class Entry {
 		}
 		return iEtim;
 	}
-	
+
 	private static DefContainer defcontL1;
 	private static DefContainer defcontL2;
 	
-	/***
-	 * Category types
-	 */
-	public final static String T_NOUN_PLURAL	= "NOUN_PLURAL";
-	public final static String T_NOUN_PROPER	= "NOUN_PROPER";
-	public final static String T_NOUN			= "NOUN";
-	public final static String T_ADVERB			= "ADVERB";
-	public final static String T_PRESENT_3S		= "PRESENT_3S";
-	public final static String T_VERB_ING		= "VERB_ING";	
-	public final static String T_VERB_ED		= "VERB_ED";
-	public final static String T_PLACE 			= "PLACE";
-	public final static String T_SURNAME		= "SURNAME";
-	public final static String T_GN_MALE		= "GIVEN_NAME_MALE";
-	public final static String T_GN_FEMALE		= "GIVEN_NAME_FEMALE";
-	public final static String T_UNISEX1		= "unisex";
-	public final static String T_UNISEX2		= "ambiguous";
-	public final static String T_GN_DIM			= "GIVEN_NAME_DIM";
-	
-	public final static String IDENT1	= "=";
-	public final static String IDENT2	= "==";
-	public final static String IDENT3	= "===";
-	public final static String IDENT4	= "====";
-	
-
-	private final static String MALE = "male";
-	private final static String FEMALE = "female";	
-	
-	public final static String UK = "UK";
-	public final static String US = "US";
-	public final static String GE = "";
-	
-	public final static String ENGLISH = "en";
-	public final static String SPANISH = "es";
-	public final static String NOUN = "Noun";
-	public final static String PROPER_NOUN = "Proper noun";
-	
-	public final static String TEMPLATE_PLURAL 		= "plural of";
-	public final static String TEMPLATE_INFLECTION = "infl of";
-	public final static String TEMPLATE_IPA			= "IPA";
-	public final static String TEMPLATE_AUDIO 		= "audio";
-	public final static String TEMPLATE_WIKIPEDIA1	= "pedia";
-	public final static String TEMPLATE_WIKIPEDIA2	= "Wikipedia";
-	public final static String TEMPLATE_DIMINUTIVE	= "diminutive of";
-	public final static String TEMPLATE_GIVENNAME	= "given name";
-	public final static String TEMPLATE_HOMOPHONE	= "homophones";
-	public final static String TEMPLATE_SYN1	  = "syn";
-	public final static String TEMPLATE_SYN2	  = "synonyms";
-	public final static String TEMPLATE_ADV		  = "en-adv";
-	public final static String TEMPLATE_SURNAME	  = "surname";
-	public final static String TEMPLATE_PLACE	  = "place";
-	public final static String TEMPLATE_T1		  = "t";			//*** TRANSLATIONS
-	public final static String TEMPLATE_T2		  = "t+";
-	public final static String TEMPLATE_T3		  = "t-check";
-	public final static String TEMPLATE_T4		  = "t+check";
-	public final static String TEMPLATE_T5		  = "tt";
-	public final static String TEMPLATE_INITIALS  = "initialism of";	//*** ETIMOLOGIES
-	public final static String TEMPLATE_BOR1	  = "bor";
-	public final static String TEMPLATE_BOR2	  = "bor+";	
-	public final static String TEMPLATE_DER		  = "der";
-	public final static String TEMPLATE_INH		  = "inherited";
-	public final static String TEMPLATE_INH1	  = "inh+";
-	public final static String TEMPLATE_INH2	  = "inh";	
-	
-	private static String LAST_L4;	
+	private static String LAST_L4;
 }

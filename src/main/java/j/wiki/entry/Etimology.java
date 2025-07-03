@@ -30,13 +30,13 @@ public class Etimology {
 	public Etimology.Type type;
 	public String text;
 	public List<EtimLang> etims;
-	public List<GramCat> gramcats;
+	public List<GramCatContainer> gc_conts;
 	
 	public Etimology(int i)
 	{
 		iEtim = i;
 		etims = new ArrayList<EtimLang>();
-		gramcats = new ArrayList<GramCat>();
+		gc_conts = new ArrayList<GramCatContainer>();
 		type = Type.UNKNOWN;
 	}
 	
@@ -48,6 +48,11 @@ public class Etimology {
 		return etim;
 	}
 	
+	public void add(GramCatContainer gc_cont)
+	{
+		gc_conts.add(gc_cont);
+	}
+	
 	public void addEtimLang(EtimLang etimlang)
 	{
 		etims.add(etimlang);
@@ -56,36 +61,58 @@ public class Etimology {
 	public boolean hasDefs()
 	{
 		int iDefCnt = 0;
-		for(GramCat gramcat: gramcats )
+		for(GramCatContainer gc_cont: gc_conts )
 		{
-			iDefCnt += gramcat.getDefsCount();
+			iDefCnt += gc_cont.getDefsCount();
 		}
 		return iDefCnt > 0;
 	}
 	
 	public int getCatsCount()
 	{
-		return gramcats.size();		
+		return gc_conts.size();		
 	}
 	
 	public int getDefsCount()
 	{
 		int iCount = 0;
 		
-		for(GramCat g: gramcats)
+		for(GramCatContainer gc_cont: gc_conts)
 		{
-			iCount = iCount + g.getDefsCount();
+			iCount = iCount + gc_cont.getDefsCount();
 		}
 		return iCount;
 	}
 	
-	public GramCat getLastDef()
+	public String getDefTxt(int iDef)
 	{
-		GramCat catgram = null;
+		StringBuilder buffer = new StringBuilder();
+		Definition def;
+		List<Definition> defs = new ArrayList<Definition>();
 		
-		if( gramcats.size() > 0)
+		for(GramCatContainer gc_cont: gc_conts)
 		{
-			catgram = gramcats.get(gramcats.size()-1);
+			for(Definition def2: gc_cont.defs)
+			{
+				if(! def2.hasDefChildren() )
+				{
+					defs.add(def2);
+				}
+			}
+		}
+		def = defs.get(iDef);
+		def.toWiki(buffer,  1);
+		
+		return buffer.toString();
+	}
+	
+	public GramCatContainer getLastDef()
+	{
+		GramCatContainer catgram = null;
+		
+		if( gc_conts.size() > 0)
+		{
+			catgram = gc_conts.get(gc_conts.size()-1);
 		}
 		
 		return catgram;
@@ -93,25 +120,25 @@ public class Etimology {
 	
 	public void addSyn(String strSyn)
 	{
-		GramCat catgram = getLastDef();
+		GramCatContainer catgram = getLastDef();
 		if( catgram != null)
 		{
 			catgram.addSyn(strSyn);
 		}
 	}
 	
-	public void addGramCat(GramCat catgram)
+	public void addGramCat(GramCatContainer catgram)
 	{
-		gramcats.add(catgram);
+		gc_conts.add(catgram);
 	}
 	
 	public boolean hasFlexibleForm()
 	{
 		boolean bHasFlexive = false;
 		
-		for(GramCat gramcat: gramcats)
+		for(GramCatContainer gc_cont: gc_conts)
 		{
-			if( gramcat.isFlexibleForm() )
+			if( gc_cont.isFlexibleForm() )
 			{
 				bHasFlexive = true;
 				break;
@@ -123,15 +150,15 @@ public class Etimology {
 	public void sort()
 	{
 		int iGramCat = 0;
-		for(GramCat gramcat: gramcats)
+		for(GramCatContainer gc_container: gc_conts)
 		{
-			if( iGramCat < gramcats.size()-1 )
+			if( iGramCat < gc_conts.size()-1 )
 			{
-				if( gramcat.isFlexibleForm() )
+				if( gc_container.isFlexibleForm() )
 				{
-					if( !gramcats.get(iGramCat+1).isFlexibleForm() )
+					if( !gc_conts.get(iGramCat+1).isFlexibleForm() )
 					{
-						Collections.swap(gramcats, iGramCat, iGramCat+1);
+						Collections.swap(gc_conts, iGramCat, iGramCat+1);
 					}
 				}
 			}

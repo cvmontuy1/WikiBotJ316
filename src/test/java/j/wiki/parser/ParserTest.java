@@ -6,18 +6,16 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ParserTest {
 
 	@Test
-	public void test1()
+	public void testWikiText1()
 	{
 		ParserEntry entry;
 		
 		entry = new ParserEntry("en", "test", WIKITEXT1);
-
-		
-		//System.out.println("Entry");
-		//System.out.println(entry.toString());		
-		//System.out.println("Template count:" + entry.tree.count(TokenType.DEFINITION));
-
 	
+		//System.out.println("WikiText1 " + entry.toString());		
+		//System.out.println("WikiText1 def cnt:" + entry.tree.count(TokenType.DEFINITION));
+
+
 		assertNotNull(entry.tree.find(TokenType.BULLET));
 		assertNotNull(entry.tree.find(TokenType.DEFINITION));		
 		assertNotNull(entry.tree.find(TokenType.FILE));

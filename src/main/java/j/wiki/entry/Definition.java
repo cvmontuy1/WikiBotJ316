@@ -25,28 +25,28 @@ import j.wiki.Util;
 
 
 public class Definition {	
-	public GramCat gramcat;  // Calculado
+	public GramCat gramcat;  
 	public String text;
-	public String type;		// 
+	public GramCat.Subtype subtype;		// 
 	public boolean bLiteral;
 	public boolean bNoLink;
 	public int intIdx;
 	public List<String> syns;
 	private DefContainer defcontainer;
 	
-	public Definition(String type, String stext)	
+	public Definition( GramCat.Subtype subtype, String stext)	
 	{	
-		this.type = type;
+		this.subtype = subtype;
 		this.text = stext;
 		bLiteral = false;
 		this.defcontainer = null;
-	
+		gramcat = GramCat.build(subtype);
 		syns = new ArrayList<String>();		
 	}
 	
-	public Definition(String type, String stext, boolean bLiteral)	
+	public Definition(GramCat.Subtype subtype, String stext, boolean bLiteral)	
 	{
-		this(type, stext);
+		this(subtype, stext);
 		this.bLiteral = bLiteral;	
 	}
 	
@@ -80,11 +80,11 @@ public class Definition {
 		
 		if( text == null )
 		{
-			bEq = type.equals(def.type) && text == def.text;
+			bEq = subtype == def.subtype && def.text == null;
 		}
 		else
 		{
-			bEq =  type.equals(def.type) && text.equals(def.text);
+			bEq =  subtype == def.subtype && text.equals(def.text);
 		}
 		
 		return bEq;
@@ -115,28 +115,16 @@ public class Definition {
 	
 	public boolean isFlexibleForm()
 	{
-		return GramCat.isFlexibleForm(type);
+		return GramCatContainer.isFlexibleForm(subtype);
 	}
 
-	public void setGramCat(GramCat gramcat)
-	{
-		if( this.gramcat == null || this.gramcat.type.equals(gramcat.type))
-		{
-			this.gramcat = gramcat;
-		}
-		else
-		{
-			Util.reportError("Definition.setGramCat types are different ");
-		}
 	
-	}
-
 	public int toWiki(StringBuilder buffer, int iDef)
 	{
 		
-		switch(type)
+		switch(subtype)
 		{
-			case Entry.T_NOUN_PLURAL:
+			case NOUN_PLURAL:
 				appendLevel4(buffer, gramcat.wikitext);
 				
 				buffer.append(";").append(iDef).append(": ");
@@ -151,24 +139,24 @@ public class Definition {
 				appendSyns(buffer);				
 				++iDef;				
 				break;
-			case Entry.T_PLACE:
+			case PLACE:
 				buffer.append(";").append(iDef).append(": ");
 				buffer.append(text).append(Util.LF);
 				++iDef;				
 				break;
-			case Entry.T_PRESENT_3S:
+			case VERB_3S:
 				appendLevel4(buffer, gramcat.wikitext);				
 				buffer.append(";").append(iDef).append(": ");
 				buffer.append("{{forma verbo-en|").append(text).append("|3s|presente}}.").append(Util.LF);
 				++iDef;				
 				break;
-			case Entry.T_VERB_ING:
+			case VERB_ING:
 				appendLevel4(buffer, gramcat.wikitext);				
 				buffer.append(";").append(iDef).append(": ");
 				buffer.append("{{participio|leng=en|").append(text).append("|presente}}.").append(Util.LF);
 				++iDef;				
 				break;
-			case Entry.T_VERB_ED:
+			case VERB_ED:
 				appendLevel4(buffer, gramcat.wikitext);				
 				buffer.append(";").append(iDef).append(": ");
 				buffer.append("{{forma verbo-en|").append(text).append("|pasado}}.").append(Util.LF);
@@ -178,40 +166,39 @@ public class Definition {
 				++iDef;				
 				break;
 				
-			case Entry.T_SURNAME:
+			case SURNAME:
 				buffer.append(";").append(iDef).append(": ");
 				buffer.append("{{apellido|leng=en}}.").append(Util.LF);
 				++iDef;				
 				break;
-			case Entry.T_GN_MALE:
+			case GN_MALE:
 				buffer.append(";").append(iDef).append(": ");
 				buffer.append("{{antropónimo masculino|leng=en}}.").append(Util.LF);
 				++iDef;				
 				break;
-			case Entry.T_GN_FEMALE:
+			case GN_FEMALE:
 				buffer.append(";").append(iDef).append(": ");
 				buffer.append("{{antropónimo femenino|leng=en}}.").append(Util.LF);
 				++iDef;				
 				break;
-			case Entry.T_UNISEX1:
-			case Entry.T_UNISEX2:				
+			case GN_UNISEX:			
 				buffer.append(";").append(iDef).append(": ");
 				buffer.append("{{antropónimo ambiguo|leng=en}}.").append(Util.LF);
 				++iDef;				
 				break;
-			case Entry.T_GN_DIM:
+			case GN_DIMINUTIVE:
 				buffer.append(";").append(iDef).append(": ");					
 				buffer.append("{{hipocorístico|leng=en|").append(text).append("}}.").append(Util.LF);
 				++iDef;					
 				break;	
-			case Entry.T_NOUN_PROPER:
+			case NOUN_PROPER:
 				buffer.append(";").append(iDef).append(": ");
 				buffer.append(text).append(Util.LF);
 				
 				appendSyns(buffer);
 				++iDef;
 				break;
-			case Entry.T_NOUN:
+			case NOUN:
 				buffer.append(";").append(iDef).append(": ");
 				if(bNoLink)
 				{
@@ -224,7 +211,7 @@ public class Definition {
 				appendSyns(buffer);				
 				++iDef;				
 				break;
-			case Entry.T_ADVERB:
+			case ADVERB:
 				buffer.append(";").append(iDef).append(": ");
 				if(bNoLink)
 				{
@@ -239,7 +226,7 @@ public class Definition {
 				++iDef;
 				break;
 			default:
-				Util.reportError("Mssing defintion type:", type);
+				Util.reportError("Mssing defintion type:", subtype);
 				break;
 				
 		}
@@ -266,7 +253,7 @@ public class Definition {
 	{
 		if( !title.equals(Entry.getLastL4()) )
 		{
-			buffer.append(Entry.IDENT4).append(" ").append(title).append(" ").append(Entry.IDENT4).append(Util.LF);
+			buffer.append(Constants.IDENT4).append(" ").append(title).append(" ").append(Constants.IDENT4).append(Util.LF);
 		}
 		Entry.setLastL4(title);
 	}

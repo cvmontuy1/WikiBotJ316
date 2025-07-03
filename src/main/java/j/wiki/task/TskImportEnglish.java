@@ -38,6 +38,7 @@ import j.wiki.ITask;
 import j.wiki.Util;
 import j.wiki.entry.Command;
 import j.wiki.entry.Entry;
+import j.wiki.entry.En2Es;
 import j.wiki.parser.ParserEntry;
 
 import java.util.regex.Matcher;
@@ -142,7 +143,7 @@ implements ITask
 			else
 			{
 				pentry = new ParserEntry("en", strTitle, concatenate(content));				
-				entry = Entry.buildEntry(strTitle, pentry);
+				entry = En2Es.buildEntry(strTitle, pentry);
 				if( entry.isComplete())
 				{
 					strWikiText = entry.toWiki();
