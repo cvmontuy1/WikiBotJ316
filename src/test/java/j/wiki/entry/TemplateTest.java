@@ -5,8 +5,6 @@ import j.wiki.parser.Token;
 
 import org.junit.jupiter.api.*;
 
-import j.wiki.parser.ParserEntry;
-import j.wiki.parser.ParserTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 

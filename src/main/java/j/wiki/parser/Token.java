@@ -32,7 +32,7 @@ public class Token {
     private int startPos;
     private int endPos;
     private int level;
-	private int index;  
+	//private int index;  
 
     public Token(TokenType type, String value, int startPos, int endPos) {
         this.type = type;
@@ -85,6 +85,17 @@ public class Token {
     	return children != null && children.size() > 0;
     }
     
+    public Token getChild(int iChild)
+    {
+    	Token child = null;
+    	
+    	if( hasChildren() )
+    	{
+    		child = children.get(iChild);    		
+    	}
+    		
+    	return child;    	
+    }
     public Token getLastChildren()
     {
     	Token child = null;
@@ -191,12 +202,12 @@ public class Token {
     	return token;		
     }
     
-    public int count(TokenType type)
+    public int count(TokenType type0)
     {
     	
     	int iCount = 0;
     	
-    	if( this.type == type )
+    	if( this.type == type0 )
 		{
     		++iCount;
 		}
@@ -204,7 +215,7 @@ public class Token {
     	{
     		for(Token t: children)
     		{
-    			iCount = iCount + t.count(type);
+    			iCount +=  t.count(type0);
     		}
     	}    	
     	return iCount;

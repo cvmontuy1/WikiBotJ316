@@ -23,7 +23,6 @@ public class En2Es {
 		iEtimology = 0;
 		for(Token token : pentry.getChildren())
 		{
-
 			switch(token.getType())
 			{
 				case TokenType.TEMPLATE:
@@ -51,8 +50,7 @@ public class En2Es {
 								else if( inf_name.equals("ed-form"))
 								{
 									entry.addVerbForm(iEtimology, GramCat.Subtype.VERB_ED, template.getParameter(2));
-								}									
-								
+								}								
 							}
 							break;
 						case TEMPLATE_IPA:
@@ -75,8 +73,7 @@ public class En2Es {
 									if( isIPA_CA(template.getParameter("a")) )
 									{
 										entry.addAPI(Constants.CA, template.getParameter(2));
-									}
-									
+									}									
 								}
 								else
 								{
@@ -122,6 +119,7 @@ public class En2Es {
 							}
 							break;
 						case TEMPLATE_WIKIPEDIA2:
+						case TEMPLATE_WIKIPEDIA3:	
 							entry.setWikipedia();
 							break;
 						case TEMPLATE_DIMINUTIVE:
@@ -210,6 +208,12 @@ public class En2Es {
 								}
 							}
 							break;
+						case TEMPLATE_SUFFIX:
+							if( template.getParameter(1).equals(ENGLISH) )
+							{		
+								entry.addEtimSufix(iEtimology, EtimLang.Type.SUFFIX, template.getParameter(1), template.getParameter(2), template.getParameter(3) );								
+							}
+							break;
 						case TEMPLATE_INITIALS:
 							if( template.getParameter(1).equals(ENGLISH) )
 							{
@@ -241,7 +245,6 @@ public class En2Es {
 					{
 						entry.addDim(iEtimology, diminutive);
 					}			
-					
 					break;
 				default:
 						// Ignored tokens
@@ -258,15 +261,17 @@ public class En2Es {
 
 	private static boolean isIPA_US(String value)
 	{
-		return  value.contains(Constants.US) ||
-				value.contains("GA") ||
+		return  value.contains(Constants.US)	||
+				value.contains("GA") 			||
+				value.contains("GenAm") 			||
 				value.contains("United States");
 	}
 	
 	private static boolean isIPA_UK(String value)
 	{
 		return value.contains(Constants.UK) ||
-			   value.contains("England") ||
+			   value.contains("RP")			||
+			   value.contains("England")	||
 			   value.contains("United Kingdom");
 				
 	}
@@ -290,31 +295,33 @@ public class En2Es {
 	public final static String NOUN = "Noun";
 	public final static String PROPER_NOUN = "Proper noun";
 	
-	public final static String TEMPLATE_PLURAL 		= "plural of";
-	public final static String TEMPLATE_INFLECTION = "infl of";
-	public final static String TEMPLATE_IPA			= "IPA";
-	public final static String TEMPLATE_AUDIO 		= "audio";
-	public final static String TEMPLATE_WIKIPEDIA1	= "pedia";
-	public final static String TEMPLATE_WIKIPEDIA2	= "Wikipedia";
-	public final static String TEMPLATE_DIMINUTIVE	= "diminutive of";
-	public final static String TEMPLATE_GIVENNAME	= "given name";
-	public final static String TEMPLATE_HOMOPHONE	= "homophones";
-	public final static String TEMPLATE_SYN1	  = "syn";
-	public final static String TEMPLATE_SYN2	  = "synonyms";
-	public final static String TEMPLATE_ADV		  = "en-adv";
-	public final static String TEMPLATE_SURNAME	  = "surname";
-	public final static String TEMPLATE_PLACE	  = "place";
-	public final static String TEMPLATE_T1		  = "t";			//*** TRANSLATIONS
-	public final static String TEMPLATE_T2		  = "t+";
-	public final static String TEMPLATE_T3		  = "t-check";
-	public final static String TEMPLATE_T4		  = "t+check";
-	public final static String TEMPLATE_T5		  = "tt";
-	public final static String TEMPLATE_INITIALS  = "initialism of";	//*** ETIMOLOGIES
-	public final static String TEMPLATE_BOR1	  = "bor";
-	public final static String TEMPLATE_BOR2	  = "bor+";	
-	public final static String TEMPLATE_DER		  = "der";
-	public final static String TEMPLATE_INH		  = "inherited";
-	public final static String TEMPLATE_INH1	  = "inh+";
-	public final static String TEMPLATE_INH2	  = "inh";	
+	public final static String TEMPLATE_PLURAL			= "plural of";
+	public final static String TEMPLATE_INFLECTION		= "infl of";
+	public final static String TEMPLATE_IPA				= "IPA";
+	public final static String TEMPLATE_AUDIO			= "audio";
+	public final static String TEMPLATE_WIKIPEDIA1		= "pedia";
+	public final static String TEMPLATE_WIKIPEDIA2		= "Wikipedia";
+	public final static String TEMPLATE_WIKIPEDIA3		= "wp";
+	public final static String TEMPLATE_DIMINUTIVE		= "diminutive of";
+	public final static String TEMPLATE_GIVENNAME		= "given name";
+	public final static String TEMPLATE_HOMOPHONE		= "homophones";
+	public final static String TEMPLATE_SYN1			= "syn";
+	public final static String TEMPLATE_SYN2			= "synonyms";
+	public final static String TEMPLATE_ADV				= "en-adv";
+	public final static String TEMPLATE_SURNAME			= "surname";
+	public final static String TEMPLATE_PLACE			= "place";
+	public final static String TEMPLATE_T1				= "t";			//*** TRANSLATIONS
+	public final static String TEMPLATE_T2				= "t+";
+	public final static String TEMPLATE_T3				= "t-check";
+	public final static String TEMPLATE_T4				= "t+check";
+	public final static String TEMPLATE_T5				= "tt";
+	public final static String TEMPLATE_INITIALS		= "initialism of";	//*** ETIMOLOGIES
+	public final static String TEMPLATE_BOR1			= "bor";
+	public final static String TEMPLATE_BOR2			= "bor+";	
+	public final static String TEMPLATE_DER				= "der";
+	public final static String TEMPLATE_INH				= "inherited";
+	public final static String TEMPLATE_INH1			= "inh+";
+	public final static String TEMPLATE_INH2			= "inh";	
+	public final static String TEMPLATE_SUFFIX			= "suffix";
 	
 }

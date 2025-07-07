@@ -7,15 +7,13 @@ import java.util.List;
  * Definition container
  */
 public class DefContainer {
-	private int level;
 	private DefContainer parent;
 	private List<DefContainer> children;
 	private Definition definition;
 	
-	public DefContainer(DefContainer parent, int level)
+	public DefContainer(DefContainer parent)
 	{
 		this.parent = parent;
-		this.level = level;
 		children = new ArrayList<DefContainer>();
 		if( parent != null)
 		{
@@ -28,6 +26,11 @@ public class DefContainer {
 		return children.size() > 0;
 	}
 	
+	public boolean hasParent()
+	{
+		return parent != null;
+	}
+	
 	public DefContainer getParent()
 	{
 		return parent;
@@ -36,6 +39,17 @@ public class DefContainer {
 	public void addDefinition(Definition definition)
 	{
 		this.definition = definition;
+	}
+	
+	public Definition getParentDefinition()
+	{
+		Definition def = null;
+		
+		if( parent != null)
+		{
+			def = parent.getDefinition();
+		}
+		return def;
 	}
 	
 	public Definition getDefinition()

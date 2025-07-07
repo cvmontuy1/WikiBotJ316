@@ -5,11 +5,10 @@ import java.util.List;
 
 import j.wiki.Util;
 
-public class Place {
+public class Place extends TextSrc {
 	
 	public Place(Template template)
 	{
-		this.template = template;
 		names = new ArrayList<TypeName>();
 		
 		TypeName typename;
@@ -20,19 +19,39 @@ public class Place {
 		{
 			names.add(typename);
 		}
-		
+		else
+		{
+			Util.reportError("Place missing translation for<", template.getParameter(2), ">");			
+		}		
+
 		for(int i=3; i<=template.getUnnamedParsCnt(); ++i)
 		{
 			typename = build( template.getParameter(i), false);
+			if( i == 3)
+			{
+				name = typename;
+			}
 			if( typename.isDefined() )
 			{
 				names.add( typename ) ;
 			}
-		}
-		
+		}		
 	}
 	
-	public String toWiki()
+	public String getName()
+	{
+		return name.genrename.name;
+	}
+	
+	@Override
+	public boolean isEmpty()
+	{
+		return Util.isNullOrEmpty(getText(false));
+	}
+	
+	
+	@Override
+	public String getText(boolean bHasChildren)
 	{
 		StringBuilder buffer = new StringBuilder();
 		TypeName tname;
@@ -43,21 +62,27 @@ public class Place {
 			switch( iName )
 			{
 				case 0:
-					switch( tname.genrename.genre )
+					if( !bHasChildren )
 					{
-						case 'm':
-							buffer.append("Un ");
-							break;
-						case 'f':
-							buffer.append("Una ");						
-							break;
-						case 'n':
-							break;
+						switch( tname.genrename.genre )
+						{
+							case 'm':
+								buffer.append("Un ");
+								break;
+							case 'f':
+								buffer.append("Una ");						
+								break;
+							case 'n':
+								break;
+						}
+						buffer.append(tname.genrename.name);						
 					}
-					buffer.append(tname.genrename.name);
 					break;
 				case 1:
-					buffer.append(" en ");
+					if( !bHasChildren )
+					{					
+						buffer.append(" en ");
+					}
 					if( tname.type.equals(TYPE_COUNTY) )
 					{
 						buffer.append("el ");
@@ -83,88 +108,93 @@ public class Place {
 		String[] words;
 		
 		typename = new TypeName();
-		if( text.contains("/") )
+		if( text != null)
 		{
-			words = text.split("/");
-			if( words.length == 2)
+			if( text.contains("/") )
 			{
-				typename.code = words[0];
-				typename.name = words[1];					
+				words = text.split("/");
+				if( words.length == 2)
+				{
+					typename.code = words[0];
+					typename.name = words[1];					
+				}
+				else
+				{
+					typename.code = "";
+					typename.name = text;
+					for(String w: words)
+					{
+						if( Dictionary.contains(w))
+						{
+							typename.name = w;
+							break;
+						}
+					}
+				}
 			}
 			else
 			{
 				typename.code = "";
-				typename.name = text;
-				for(String w: words)
-				{
-					if( Dictionary.contains(w))
-					{
-						typename.name = w;
-						break;
-					}
-				}
+				typename.name = text;				
 			}
+			switch(typename.code)
+			{
+				case "c":
+					typename.type = "pais";
+					break;
+				case "carea":
+					typename.type = "área";
+					break;
+				case "city":
+					typename.type = "ciudad";
+					break;
+				case "cc":
+				case "co":
+					typename.type = TYPE_COUNTY;
+					if( Util.isNotNullOrEmpty(typename.name) )
+					{
+						typename.name = typename.name.replace("county", "");
+						typename.name = typename.name.replace("County", "");
+						typename.name = "condado de " + typename.name.trim();
+					}
+					break;					
+				case "cont":
+					typename.type = "continente";
+					break;					
+				case "dept":
+					typename.type = "departamento";
+					break;					
+				case "dist":
+					typename.type = "district";
+					break;					
+				case "riv":
+					typename.type = "rio";
+					break;					
+				case "cdp":
+				case "CDP":
+					typename.type = "lugar designado por el censo";
+					break;		
+				case "p":
+					typename.type = "provincia";
+					break;
+				case "r":
+					typename.type = "región";
+					break;
+				case "s":
+					typename.type = "estado";
+					break;					
+				default:
+					typename.type = "";
+					
+			}
+			typename.genrename = Dictionary.get(typename.name, bForced || typename.type == "");
 		}
-		else
-		{
-			typename.code = "";
-			typename.name = text;				
-		}
-		switch(typename.code)
-		{
-			case "c":
-				typename.type = "pais";
-				break;
-			case "r":
-				typename.type = "región";
-				break;
-			case "p":
-				typename.type = "provincia";
-				break;
-			case "s":
-				typename.type = "estado";
-				break;					
-			case "cc":
-			case "co":
-				typename.type = TYPE_COUNTY;
-				if( Util.isNotNullOrEmpty(typename.name) )
-				{
-					typename.name = typename.name.replace("county", "");
-					typename.name = typename.name.replace("County", "");
-					typename.name = "condado de " + typename.name.trim();
-				}
-				break;					
-			case "cont":
-				typename.type = "continente";
-				break;					
-			case "dept":
-				typename.type = "departamento";
-				break;					
-			case "dist":
-				typename.type = "district";
-				break;					
-			case "riv":
-				typename.type = "rio";
-				break;					
-			case "carea":
-				typename.type = "área";
-				break;					
-			case "cdp":
-			case "CDP":
-				typename.type = "lugar designado por el censo";
-				break;					
-			default:
-				typename.type = "";
-				
-		}
-		typename.genrename = Dictionary.get(typename.name, bForced || typename.type == "");
 		return typename;
 	}
 
 	
 	private static class TypeName
 	{
-		int   order;
 		String code;
 		String type;  // Ciudad, Estado, Pais
 		String name;
@@ -177,6 +207,6 @@ public class Place {
 	}
 	
 	private final static String TYPE_COUNTY = "county";
-	private Template template;
+	private TypeName name;
 	private List<TypeName> names;	
 }

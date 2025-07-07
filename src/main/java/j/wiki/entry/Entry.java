@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 
 import j.wiki.Util;
-import j.wiki.parser.ParserEntry;
 import j.wiki.parser.Token;
 import j.wiki.parser.TokenType;
 import j.wiki.task.TskImportEnglish;
@@ -48,6 +47,7 @@ public class Entry {
 		
 		defcontL1	= null;
 		defcontL2	= null;
+		defcontL3	= null;
 
 		bWikipedia = false;
 	}
@@ -237,7 +237,7 @@ public class Entry {
 			iDef = 1;
 			if( !etimology.hasFlexibleForm() )
 			{
-				if( etimology.iEtim == 0)
+				if( etimology.getEtimId() == 0)
 				{
 					buffer.append(Util.LF);
 					buffer.append(Constants.IDENT3).append(" Etimología ").append(Constants.IDENT3).append(Util.LF);				
@@ -245,7 +245,7 @@ public class Entry {
 				else
 				{
 					buffer.append(Util.LF);					
-					buffer.append(Constants.IDENT3).append(" Etimología ").append(etimology.iEtim).append(Constants.IDENT3).append(Util.LF);
+					buffer.append(Constants.IDENT3).append(" Etimología ").append(etimology.getEtimId()).append(Constants.IDENT3).append(Util.LF);
 				}
 				etimology.toWiki(buffer);
 			}
@@ -295,12 +295,12 @@ public class Entry {
 	
 	public void addNounPlural(int iEtim, String strPlural)
 	{
-		addDefinition(iEtim, GramCat.Subtype.NOUN_PLURAL, strPlural);
+		addDefinition(iEtim, GramCat.Subtype.NOUN_PLURAL, strPlural, false);
 	}
 
 	public void addVerbForm(int iEtim, GramCat.Subtype subtype, String strPlural)
 	{
-		addDefinition(iEtim, subtype, strPlural);
+		addDefinition(iEtim, subtype, strPlural, false);
 	}
 
 	
@@ -311,7 +311,7 @@ public class Entry {
 		{
 			if( Util.isNotNullOrEmpty(name))
 			{
-				addDefinition(iEtim, GramCat.Subtype.GN_DIMINUTIVE, name);
+				addDefinition(iEtim, GramCat.Subtype.GN_DIMINUTIVE, name, false /* literal */);
 			}
 		}
 	}
@@ -322,23 +322,13 @@ public class Entry {
 		GramCatContainer gc_container;		
 		boolean bFound;
 		
-		while(etimology == null)
+		if( GramCatContainer.isFlexibleForm(subtype) )
 		{
-			if( etims.size() <= iEtim )
-			{
-				int iSize = etims.size();
-				for(int i= iSize;  i<iEtim+1; ++i )
-				{				
-					etims.add(new Etimology(i) );
-				}
-			}				
-			
-			etimology = etims.get(iEtim);
-			if( !GramCatContainer.isFlexibleForm(subtype) && etimology.hasFlexibleForm() )
-			{
-				etimology = null;
-				++iEtim;
-			}
+			etimology = getEtimFlexform();
+		}
+		else
+		{
+			etimology = getEtimology(iEtim);
 		}
 		
 		bFound = false;
@@ -363,50 +353,34 @@ public class Entry {
 	{
 		if( strName.equals(Constants.UNISEX1) || strName.equals(Constants.UNISEX2) )
 		{
-			addDefinition(iEtim, GramCat.Subtype.GN_UNISEX, "");
+			addDefinition(iEtim, GramCat.Subtype.GN_UNISEX, "", false);
 		}
 		else
 		{
 			if( strName.equals(Constants.MALE) )
 			{
-				addDefinition(iEtim, GramCat.Subtype.GN_MALE, "");
+				addDefinition(iEtim, GramCat.Subtype.GN_MALE, "", false);
 			}
 			else if( strName.equals(Constants.FEMALE) )
 			{
-				addDefinition(iEtim, GramCat.Subtype.GN_FEMALE, "");
+				addDefinition(iEtim, GramCat.Subtype.GN_FEMALE, "", false);
 			}
 		}
 	}
 	
 	public void addPlace(int iEtim, Template template)
-	{
-		StringBuilder buffer = new StringBuilder();
-		String strPlace;
-		Definition definition;
-		Place place;
+	{		
+		Place place = new Place(template);
 		
-		place = new Place(template);
-		
-		strPlace = place.toWiki();
-		if( defcontL2 != null)
+		if( !place.isEmpty() )
 		{
-			buffer.append(strPlace);
-			definition = defcontL1.getDefinition();
-			if( definition != null && Util.isNotNullOrEmpty(definition.text) )				
-			{			
-				buffer.append(", ").append(definition.text);
-			}
-			strPlace = buffer.toString();
-		}
-		if( Util.isNotNullOrEmpty(strPlace) )
-		{
-			addDefinition(iEtim, GramCat.Subtype.PLACE, strPlace);
+			addDefinition(iEtim, GramCat.Subtype.PLACE, place, false);
 		}
 	}
 	
 	public void addSurname(int iEtim)
 	{
-		addDefinition(iEtim, GramCat.Subtype.SURNAME, "");
+		addDefinition(iEtim, GramCat.Subtype.SURNAME, "", false);
 	}
 	
 	public void addAdv(int iEtim, String comparative, String superlative)
@@ -486,6 +460,12 @@ public class Entry {
 		etimology = etims.get(iEtim);
 		etimology.addSyn(strSyn);
 	}
+	
+	public void addEtimSufix(int iEtim, EtimLang.Type type, String lang, String words, String suffix )
+	{
+		Etimology etim = getEtimology(iEtim);
+		etim.addEtimLang( EtimLang.buildSuffix(lang, words, suffix));
+	}
 
 	public void addEtimology(int iEtim, EtimLang.Type type, String lang, String words, String transliteración)
 	{
@@ -514,9 +494,9 @@ public class Entry {
 				bFound=true;
 				break;
 			}
-			if( iEtim <= e.iEtim )
+			if( iEtim <= e.getEtimId() )
 			{
-				iEtim = e.iEtim + 1;
+				iEtim = e.getEtimId() + 1;
 			}
 		}
 		
@@ -601,18 +581,12 @@ public class Entry {
 		
 		clear();
 		
-		for(Etimology etim: etims)
-		{
-			if( !etim.hasDefs() )
-			{
-				etims.remove(etim);
-			}
-		}
+		etims.removeIf( item -> item.hasDefs() == false );
 
 		Command cmd = TskImportEnglish.getCommand(entry);
 		if( cmd != null && cmd.hasDefs() )
 		{
-			iEtim = etims.get(0).iEtim;
+			iEtim = etims.get(0).getEtimId();
 			for(Definition def : cmd.defs)
 			{
 				bAdded = false;
@@ -620,7 +594,7 @@ public class Entry {
 				{
 					if( !etim.hasFlexibleForm() )
 					{
-						addDefinition(etim.iEtim, def.subtype, def.text, true);
+						addDefinition(etim.getEtimId(), def.subtype, def.getText(), true);
 						bAdded = true;
 						break;
 					}
@@ -629,7 +603,7 @@ public class Entry {
 				{
 					Etimology etim = new Etimology(nextEtimId());
 					etims.add(etim);					
-					addDefinition(etim.iEtim, def.subtype, def.text, true);
+					addDefinition(etim.getEtimId(), def.subtype, def.getText(), true);
 				}
 			}
 		}
@@ -675,21 +649,25 @@ public class Entry {
 			}
 			for( Etimology etimology: etims)
 			{
-				etimology.iEtim = iEtim;
+				etimology.setEtimId(iEtim);
 				++iEtim;
 			}
 		}
-		
+/*		
 		if( etims.size() == 1)
 		{
-			if( etims.get(0).gc_conts.size() == 1 )
+			if( etims.get(0).gc_conts != null )
 			{
-				for(Definition def : etims.get(0).gc_conts.get(0).defs )
+				if( etims.get(0).gc_conts.size() == 1)
 				{
-					
+					for(Definition def : etims.get(0).gc_conts.get(0).defs )
+					{
+						
+					}
 				}
 			}
 		}
+*/		
 	}
 	
 	public void setDefContainer(Token token)
@@ -697,12 +675,18 @@ public class Entry {
 		switch(token.getLevel())
 		{
 			case 1:
-				defcontL1 = new DefContainer(null, token.getLevel());
+				defcontL1 = new DefContainer(null);
 				defcontL2 = null;
+				defcontL3 = null;
 				break;
 			case 2:
-				defcontL2 = new DefContainer(defcontL1, token.getLevel());
+				defcontL2 = new DefContainer(defcontL1);
+				defcontL3 = null;
 				break;
+			case 3:
+				defcontL3 = new DefContainer(defcontL2);
+				break;
+				
 		}
 	}
 	
@@ -714,70 +698,90 @@ public class Entry {
 		int iEtim = 0;
 		for(Etimology etim: etims)
 		{
-			if( iEtim <= etim.iEtim)
+			if( iEtim <= etim.getEtimId())
 			{
-				iEtim = etim.iEtim;
+				iEtim = etim.getEtimId();
 			}
 		}
 		return iEtim + 1;
 	}
 
-	
-	private Etimology getEtimology(int i)
+	private Etimology getEtimFlexform()
 	{
-		Etimology etim = null;
+		Etimology etimology = null;
+		int iEtim = 0;
+		boolean bUsesZero = false;
 		
 		for(Etimology e: etims)
 		{
-			if( e.iEtim == i)
+			if( e.hasFlexibleForm() )
 			{
-				etim = e;
+				etimology = e;
+				break;
+			}
+			
+			if( iEtim < e.getEtimId()  )
+			{
+				iEtim = e.getEtimId();
+			}
+			if( e.getEtimId() == 0)
+			{
+				bUsesZero = true;
+			}
+		}		
+		
+		if( etimology == null)
+		{
+			if( bUsesZero )
+			{
+				iEtim = iEtim + 1;
+			}
+			else
+			{
+				iEtim = 0;
+			}
+			etimology = new Etimology(iEtim);
+			etims.add(etimology);			
+		}
+		
+		return etimology;
+	}
+	
+	private Etimology getEtimology(int i)
+	{
+		Etimology etimology = null;
+		
+		for(Etimology e: etims)
+		{
+			if( e.getEtimId() == i)
+			{
+				etimology = e;
 				break;
 			}
 		}
 		
-		if( etim == null)
+		if( etimology == null)
 		{
-			etim = new Etimology(i);
-			etims.add(etim);
+			etimology = new Etimology(i);
+			etims.add(etimology);
 		}
 		
-		return etim;
+		return etimology;
 	}
 	
-	
-	private void addDefinition(int iEtim, GramCat.Subtype subtype, String strDef)
-	{
-		addDefinition(iEtim, subtype, strDef, false);
-	}
-	
-	private int addDefinition(int iEtim, GramCat.Subtype subtype, String strDef, boolean bLiteral)
+	private int addDefinition(int iEtim, GramCat.Subtype subtype, TextSrc txtsrc, boolean bLiteral)
 	{
 		Etimology etimology;
 		boolean bFound = false;
 		boolean bAdded = false;
 		Definition def;
 		
-		strDef = Util.trim(strDef);
-		def = new Definition(subtype, strDef, bLiteral);
+		def = new Definition(subtype, txtsrc, bLiteral);
 		etimology = null;
 		
 		if( def.isFlexibleForm() )
 		{
-			for(Etimology etim : etims)
-			{
-				if( etim.hasFlexibleForm() )
-				{
-					etimology = etim;
-				}
-			}
-
-			if( etimology == null)
-			{
-				iEtim = etims.size() + 1;
-				etimology = new Etimology(iEtim);
-				etims.add(etimology);
-			}
+			etimology = getEtimFlexform();
 		}
 		else
 		{
@@ -800,15 +804,11 @@ public class Entry {
 				if( !bFound )
 				{
 					catgram1.addDefinition(def);
-					if( defcontL2 != null)
-					{
-						def.setContainer(defcontL2);
-					} 
-					else if( defcontL1 != null )
-					{
-						def.setContainer(defcontL1);
-					}		
 					
+					if( getLastDefContainer() != null )
+					{
+						def.setContainer(getLastDefContainer());
+					}					
 					bAdded = true;
 				}
 				break;
@@ -820,20 +820,42 @@ public class Entry {
 			gc_container = new GramCatContainer();
 			gc_container.addDefinition( def );
 			etimology.add(gc_container);
-			if( defcontL2 != null)
+			
+			if( getLastDefContainer() != null )
 			{
-				def.setContainer(defcontL2);
-			} 
-			else if( defcontL1 != null )
-			{
-				def.setContainer(defcontL1);
+				def.setContainer(getLastDefContainer());
 			}
 		}
 		return iEtim;
+
+	}
+	
+	private int addDefinition(int iEtim, GramCat.Subtype subtype, String strDef, boolean bLiteral)
+	{
+		return addDefinition(iEtim, subtype, new TextSrcSimple(strDef), bLiteral);
+	}
+	
+	private static DefContainer getLastDefContainer()
+	{
+		DefContainer defcont = null;
+		if( defcontL3 != null)
+		{
+			defcont = defcontL3;
+		}
+		else if( defcontL2 != null)
+		{
+			defcont = defcontL2;
+		} 
+		else if( defcontL1 != null )
+		{
+			defcont = defcontL1;
+		}
+		return defcont;
 	}
 
 	private static DefContainer defcontL1;
 	private static DefContainer defcontL2;
+	private static DefContainer defcontL3;	
 	
 	private static String LAST_L4;
 }

@@ -1,6 +1,9 @@
 package j.wiki.parser;
 
 import org.junit.jupiter.api.*;
+
+import j.wiki.Util;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ParserTest {
@@ -12,9 +15,9 @@ public class ParserTest {
 		
 		entry = new ParserEntry("en", "test", WIKITEXT1);
 	
-		//System.out.println("WikiText1 " + entry.toString());		
-		//System.out.println("WikiText1 def cnt:" + entry.tree.count(TokenType.DEFINITION));
-
+		//Util.report("WikiText1:",  entry);		
+		//Util.report("WikiText1 def cnt:" + entry.tree.count(TokenType.DEFINITION));
+		//Util.report("WikiText1 template cnt:" + entry.tree.count(TokenType.TEMPLATE));
 
 		assertNotNull(entry.tree.find(TokenType.BULLET));
 		assertNotNull(entry.tree.find(TokenType.DEFINITION));		
@@ -26,12 +29,13 @@ public class ParserTest {
 		assertNull(entry.tree.find(TokenType.TITLE, 	"Etymology 3"));
 
 		assertNotNull(entry.tree.find(TokenType.LINK, "evening"));
-		assertTrue(entry.tree.count(TokenType.DEFINITION) == 5);		
-		assertTrue(entry.tree.count(TokenType.BULLET) == 6);
-		assertTrue(entry.tree.count(TokenType.TITLE) == 8);
-		assertTrue(entry.tree.count(TokenType.TEMPLATE) == 16);
+		assertTrue(entry.tree.count(TokenType.DEFINITION) == 5);	// sometimes count 5 and sometimes 6	
+		assertTrue(entry.tree.count(TokenType.BULLET) == 4);
+		assertTrue(entry.tree.count(TokenType.TITLE) == 6);
+		assertTrue(entry.tree.count(TokenType.TEMPLATE) == 15);
 		assertTrue(entry.tree.count(TokenType.LINK) == 7);
 		assertTrue(entry.tree.count(TokenType.EXTERNAL_LINK) == 1);
+		assertTrue(entry.tree.count(TokenType.FILE) == 1);
 	}
 
 	@Test
@@ -68,19 +72,15 @@ From {{suffix|en|evening|s|pos2=plural suffix}}.<!-- justified here to show diff
 ====Noun====
 {{head|en|noun form}}
 # {{plural of|en|evening}}
-====References====
-* [http://www.thefreedictionary.com/evenings www.thefreedictionary.com]
-===Anagrams===
-* {{anagrams|en|a=eeginnsv|eevnings}}
 [[File:Chien revolver.JPG|thumb|'''Hammer''' ({{senseno|en|firearms}}) of the firing pin]]
-
+[https://en.wikitionary.org]
 ====Test====
 # A [[diminutive]] of [[Susan]] and of related female [[given name]]s.
 # A shortening of the male [[given name]] [[Benjamin]] or, less often, of [[Benedict]].
 
 """;
 
-	public final static String WIKITEXT_HANNA =  // Hanna
+public final static String WIKITEXT_HANNA =  // Hanna
 """			
 {{wikipedia}}
 ===Etymology 1===
@@ -112,7 +112,7 @@ From anglicization of {{der|en|ga|[[Ó]] [[Annadh|hAnnaigh]]||[[descendant]] of 
 * {{anagrams|en|a=aahnn|Hanan}}
 """	;
 	
-	public final static String WIKITEXT_CHARLY  =  
+public final static String WIKITEXT_CHARLY  =  
 """
 ==English==
 
@@ -145,9 +145,6 @@ From anglicization of {{der|en|ga|[[Ó]] [[Annadh|hAnnaigh]]||[[descendant]] of 
 # {{senseid|en|Q739}}{{place|en|country|cont/South America|capital=Bogotá|official=Republic of Colombia}}.
 #: {{syn|en|New Granada<q:historical>}}
 #* {{quote-journal|en|author=David Charter|title=Fafo diplomacy: How Colombia found out Trump meant business|magazine=w:The Times|url=https://www.thetimes.com/us/news-today/article/fafo-meaning-colombia-trump-tariffs-migrants-d6xhncq5z|date=2025-01-27|passage=Fafo works with small trading nations such as '''Colombia''' because US markets could quickly adapt to the greater expense of its coffee, flowers and other exports. There will be a different order of chaos, though, if Trump follows through on tariffs on the EU (17 per cent of US imports), Mexico (15 per cent), China (14 per cent) or Canada (12 per cent).|archiveurl=https://archive.ph/G8DaN|archivedate=2025-01-27}}
-
-====Derived terms====
-* {{l|en|Colombian}}
 
 ====Translations====
 {{trans-top|id=Q739|country in South America}}
@@ -184,9 +181,6 @@ public final static String WIKITEXT_MRI =
 * Xibe: {{t|sjo|ᠠᡞᠮ ᠠᠯ ᠠᡞ|tr=aim al ai}}
 {{trans-bottom}}
 
-====See also====
-* {{sense|magnetic resonance imaging}} {{l|en|CAT}}, {{l|en|CT}}, {{l|en|PET}}, {{l|en|X-ray}}
-
 ===Verb===
 {{en-verb}}
 
@@ -197,4 +191,91 @@ public final static String WIKITEXT_MRI =
 ===Anagrams===
 * {{anagrams|en|a=imr|IRM|MIR|Mir|RMI|miR|mir|rim}}
 """;		
+
+public final static String WIKITEXT_SPIRITS =
+"""
+===Pronunciation===
+* {{IPA|en|/ˈspɪɹɪts/}}
+* {{audio|en|en-us-spirits.ogg|a=US}}
+* {{audio|en|LL-Q1860 (eng)-Mélange a trois-spirits.wav|a=UK}}
+===Verb===
+{{head|en|verb form}}
+# {{infl of|en|spirit||s-verb-form}}
+===Noun===
+{{head|en|noun form}}
+# {{plural of|en|spirit}}
+===Noun===
+{{en-noun|p}}
+# {{lb|en|chiefly|UK}} Distilled alcoholic beverages.{{attn|en| the definition below, at the top of the translation box, is considerably more specific: which is correct? }}
+#: {{syn|en|liquor|q1=chiefly American English}}
+====Translations====
+{{trans-top|strong alcoholic drink derived from fermentation and distillation}}
+* Romanian: {{t+|ro|spirt|n}}, {{t|ro|spirturi|n-p}}
+* Russian: {{t+|ru|спирт|m}}
+* Spanish: {{t+|es|licor}}
+* Swahili: {{t|sw|spiriti}}
+{{trans-bottom}}
+===See also===
+* {{l|en|hard liquor}}
+* {{l|en|short drink}}<!--should be created!-->, {{l|en|shooter}}
+===Anagrams===
+* {{anagrams|en|a=iiprsst|tripsis}}
+{{C|en|Distilled beverages}}
+""";
+
+public final static String WIKITEXT_WALLACE =
+"""
+{{wp}}
+===Etymology===
+An {{der|en|ang|-}} byname for a [[Welshman]] or [[Breton]], from {{der|en|xno|waleis||foreign}}; see {{m|ang|wielisc}}.
+===Pronunciation===
+* {{IPA|en|/ˈwɒlɪs/|a=RP}}
+* {{audio|en|LL-Q1860 (eng)-Vealhurl-Wallace.wav|a=Southern England}}
+* {{IPA|en|/ˈwɑləs/|/ˈwɔləs/|a=GA}}
+* {{rhymes|en|ɒlɪs|s=2}}
+* {{hmp|en|Wallis}}
+===Proper noun===
+{{en-proper noun|~}}
+# {{lb|en|countable}} {{surname|en|Scottish|from=nicknames}}, notably of the Scottish patriot {{w|William Wallace}}.{{cln|en|surnames from Old English}}
+# {{lb|en|countable}} {{given name|en|male|from=surnames|usage=19th century and later}}.
+# A [[placename]]:
+## {{place|en|town|s/Victoria|c/Australia}}.
+## {{place|en|locale|c/Canada}}.
+### {{place|en|community|p/Nova Scotia|;|named for William Wallace}}.{{cln|en|eponyms}}
+### {{place|en|community|p/Ontario}}.
+### {{place|en|rural municipality|in eastern|p/Saskatchewan|full=the {{w|Rural Municipality of Wallace No. 243}}}}.
+## {{place|en|locale|c/US}}.
+### {{place|en|CDP|co/Calaveras County|s/California|;|named for surveyor John Wallace}}.
+### {{place|en|city/county seat|county/Shoshone County|s/Idaho|;|named for founder Col. William R. Wallace}}.
+### {{place|en|town|s/Indiana|;|named for Indiana governor {{w|David Wallace (Indiana politician)|David Wallace}}}}.
+### {{place|en|city|s/Kansas|;|named for the nearby {{w|Fort Wallace}}}}.
+### {{place|en|CDP|s/Louisiana}}.
+### {{place|en|unincorporated community|twp:Suf/Curtis|co/Alcona County|s/Michigan}}.
+### {{place|en|unincorporated community|twp:Suf/Mellen|co/Menominee County|s/Michigan}}.
+### {{place|en|unincorporated community|s/Missouri|;|named for a railroad official}}.
+### {{place|en|village|s/Nebraska}}.
+### {{place|en|town|s/North Carolina}}.
+### {{place|en|CDP|s/South Carolina}}.
+### {{place|en|town|s/South Dakota|;|named for the original owner of the town site}}.
+### {{place|en|CDP|co/Harrison County|s/West Virginia}}.
+====Derived terms====
+{{col|en|Wallace effect|Wallacea|Wallacean|Wallace County|Wallace Line|Wallace-Woodworth}}
+====References====
+<references/>
+* Patrick Hanks, Flavia Hodges, (2001) ''A Concise Dictionary of First Names'', Oxford University Press.
+===See also===
+* {{l|en|Wallis}}	
+""";
+public final static String WIKITEXT_MAXIE =
+"""
+==English==
+===Alternative forms===
+* {{l|en|Maxy}}
+===Etymology===
+From {{suffix|en|Max|ie}}.
+===Proper noun===
+{{en-proper noun}}
+# A [[diminutive]] of the male name [[Max]].
+# A [[diminutive]] of the female name [[Maxine]].
+""";
 }

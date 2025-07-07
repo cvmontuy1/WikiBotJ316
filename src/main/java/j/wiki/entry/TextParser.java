@@ -110,20 +110,27 @@ public class TextParser {
 	{
 		String[] words;
 		String regex = "(\\s*,\\s+of\\s+|\\s*,\\s*|\\s+and\\sof\\s+|\\s+and\\s+|\\s+or\\s+|\\s+or\\s?,|\\s+of\\s+|:|;|\\.|\\[\\[|\\]\\]|\\s+)";
-		
-		if( str.contains(" and ") || str.contains(" or ") || str.contains(","))
+		words = null;
+		if( str != null )
 		{
-			words = str.split(regex);
-			for(int iWord=0; iWord < words.length; ++iWord)
+			if( str.contains(" and ") || str.contains(" or ") || str.contains(",") || str.contains(" of ") || str.contains(" the ") || str.contains(" a ") || str.contains(" an "))
 			{
-				words[iWord] = Util.trim(words[iWord]);
+				words = str.split(regex);
+				for(int iWord=0; iWord < words.length; ++iWord)
+				{
+					words[iWord] = Util.trim(words[iWord]);
+				}
+			}
+			else
+			{
+				words = new String[1];
+				words[0] = str;
 			}
 		}
 		else
 		{
-			words = new String[1];
-			words[0] = str;
-		}		
+			Util.reportError("split(null)");
+		}
 		
 		return words;
 	}
@@ -132,6 +139,7 @@ public class TextParser {
 	private final static Pattern PAT_DIM1 = Pattern.compile("A?\\s+diminutive\\s+of\\s+" + WORDS + "+", Pattern.MULTILINE);	
 	private final static Pattern PAT_DIM2 = Pattern.compile("A?\\s+shortening\\s+of\\s+" + WORDS + "+", Pattern.MULTILINE);
 	
+	private final static String[] LOC_ADJ = {"inhabited", ""};
 	private final static String[] CONNECTORS = { "a", "an", "in", "on", "of", "and", "or", "from", "the"};
 	private final static String[] NO_NOUNS = {
 			"female", "male", "ambiguous", "unisex",

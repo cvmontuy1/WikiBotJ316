@@ -30,45 +30,53 @@ public class CategoryIdx {
 	
 	public CategoryIdx(String strValue)
 	{
-		char[] chars = strValue.toCharArray();
+		char[] chars;
 		int iChar;
 		boolean bFound;
 		String strSubtype;
 		String strIdx;
 		
-		iChar = 0;
-		bFound = false;
-		for( char c: chars)
+		if( strValue != null)
 		{
-			if( Character.isDigit(c) )
+			chars = strValue.toCharArray();
+			iChar = 0;
+			bFound = false;		
+			for( char c: chars)
 			{
-				bFound = true;
-				break;
+				if( Character.isDigit(c) )
+				{
+					bFound = true;
+					break;
+				}
+				++iChar;
 			}
-			++iChar;
-		}
-		
-		if( bFound )
-		{
-			strSubtype = strValue.substring(0, iChar);
-			strIdx = strValue.substring(iChar);
+			
+			if( bFound )
+			{
+				strSubtype = strValue.substring(0, iChar);
+				strIdx = strValue.substring(iChar);
+			}
+			else
+			{
+				strSubtype = strValue.trim();
+				strIdx = "0";
+			}
+			
+			try
+			{
+	
+				subtype = GramCat.getSubytype(strSubtype);			
+				idx = Integer.parseInt(strIdx);
+			}
+			catch(Exception ex)
+			{
+				idx = 0;
+				Util.reportError(ex, "CategoryIdx invalid", strValue);
+			}
 		}
 		else
 		{
-			strSubtype = strValue.trim();
-			strIdx = "0";
-		}
-		
-		try
-		{
-
-			subtype = GramCat.getSubytype(strSubtype);			
-			idx = Integer.parseInt(strIdx);
-		}
-		catch(Exception ex)
-		{
-			idx = 0;
-			Util.reportError(ex, "CategoryIdx invalid", strValue);
+			Util.reportError("CategoryIdx(null)");
 		}
 	}
 	

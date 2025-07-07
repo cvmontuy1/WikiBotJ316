@@ -79,19 +79,24 @@ public class Dictionary
 		// Generic places
 		put("barangay", "barrio", MASCULINE);
 		put("borough", "distrito", MASCULINE);
+		put("CDP", "localidad", FEMENINE);  //  census-designated place 
 		put("city", "ciudad", FEMENINE);		
 		put("city-state", "ciudad estado", FEMENINE);
 		put("county", "condado", MASCULINE);
+		put("county seat", "Sede de condado", NEUTRE);
+		put("country", "país", MASCULINE);
 		put("community", "comunidad", FEMENINE);
 		put("ghost town", "pueblo fantasma", MASCULINE);
 		put("gulf", "golfo", MASCULINE);
 		put("hamlet", "caserio", MASCULINE);
 		put("island", "isla", FEMENINE);		
 		put("lake", "lago", MASCULINE);
-		put("locality", "localidad", FEMENINE);		
+		
+		put("locality", "localidad", FEMENINE);	
+		put("locale", "lugar", MASCULINE);
 		put("megacity", "megalópolis", FEMENINE);
 		put("monarchy", "monarquía", FEMENINE);
-		put("municipality", "municipalidad", FEMENINE);
+		put("municipality", "municipio", MASCULINE);
 		put("national capital", "capital nacional", FEMENINE);		
 		put("national park", "parque nacional", MASCULINE);		
 		put("neighborhood", "vecindario", MASCULINE);		
@@ -105,6 +110,7 @@ public class Dictionary
 		
 		put("region", "región", FEMENINE);
 		put("republic", "república", FEMENINE);
+		put("rural municipality", "municipio", MASCULINE);
 		put("several", "varios");	
 		put("small city", "ciudad", FEMENINE);		
 		put("small town", "poblado", MASCULINE);
@@ -113,7 +119,8 @@ public class Dictionary
 		put("statutory town", "pueblo", MASCULINE);
 		put("statutory city", "ciudad", MASCULINE);
 		put("town", "pueblo", MASCULINE);		
-		put("township", "municipio", MASCULINE);		
+		put("township", "municipio", MASCULINE);
+		put("twp", "municipio", MASCULINE);
 		put("unincorporated community", "comunidad", FEMENINE);
 		put("ucomm", "comunidad", FEMENINE);
 		put("valley", "valle", MASCULINE);
@@ -282,17 +289,6 @@ public class Dictionary
 		map.put(english, new GenreName(spanish, gender));		
 	}
 	
-	private static void put(String english, String spanish, boolean bMasc)
-	{
-		if( bMasc )
-		{
-			map.put(english, new GenreName(spanish, MASCULINE));
-		}
-		else
-		{
-			map.put(english, new GenreName(spanish, FEMENINE));
-		}
-	}
 	
 	public static class GenreName
 	{

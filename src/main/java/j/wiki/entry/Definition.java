@@ -26,7 +26,7 @@ import j.wiki.Util;
 
 public class Definition {	
 	public GramCat gramcat;  
-	public String text;
+	private TextSrc txtsrc;
 	public GramCat.Subtype subtype;		// 
 	public boolean bLiteral;
 	public boolean bNoLink;
@@ -34,20 +34,19 @@ public class Definition {
 	public List<String> syns;
 	private DefContainer defcontainer;
 	
-	public Definition( GramCat.Subtype subtype, String stext)	
+	public Definition( GramCat.Subtype subtype, TextSrc txtsrc, boolean bLiteral)	
 	{	
 		this.subtype = subtype;
-		this.text = stext;
-		bLiteral = false;
+		this.txtsrc = txtsrc;
+		this.bLiteral = bLiteral;
 		this.defcontainer = null;
 		gramcat = GramCat.build(subtype);
 		syns = new ArrayList<String>();		
-	}
-	
-	public Definition(GramCat.Subtype subtype, String stext, boolean bLiteral)	
+	}	
+
+	public Definition(GramCat.Subtype subtype, String text, boolean bLiteral)	
 	{
-		this(subtype, stext);
-		this.bLiteral = bLiteral;	
+		this(subtype, new TextSrcSimple(text), bLiteral);
 	}
 	
 	public void setContainer(DefContainer container)
@@ -57,6 +56,32 @@ public class Definition {
 			this.defcontainer = container;
 			container.addDefinition(this);
 		}		
+	}
+	
+	public boolean hasParent()
+	{
+		return (defcontainer!=null && defcontainer.hasParent());
+	}
+	
+	public boolean hasParentText()
+	{
+		boolean bHasText = false;
+		Definition definition;
+		
+		if( hasParent() )
+		{
+			definition = defcontainer.getParent().getDefinition();
+			if( definition != null)
+			{
+				bHasText = !definition.isEmpty();
+			}
+		}
+		return bHasText; 
+	}
+	
+	public String getParentText()
+	{
+		return defcontainer.getParent().getDefinition().getText();
 	}
 	
 	public boolean hasDefChildren()
@@ -72,19 +97,35 @@ public class Definition {
 		}
 		return bHasChildren;
 	}
+	
+	
+	public boolean isEmpty()
+	{
+		return txtsrc == null || txtsrc.isEmpty();
+	}
+	
+	public TextSrc getTextSrc()
+	{
+		return txtsrc;
+	}
+	
+	public String getText()
+	{
+		return txtsrc.getText(hasDefChildren());
+	}
 
 	
 	public boolean equals(Definition def)
 	{
 		boolean bEq;
 		
-		if( text == null )
+		if( txtsrc.isEmpty() )
 		{
-			bEq = subtype == def.subtype && def.text == null;
+			bEq = subtype == def.subtype && def.isEmpty();
 		}
 		else
 		{
-			bEq =  subtype == def.subtype && text.equals(def.text);
+			bEq =  subtype == def.subtype && txtsrc.equals(def.getTextSrc());
 		}
 		
 		return bEq;
@@ -120,8 +161,7 @@ public class Definition {
 
 	
 	public int toWiki(StringBuilder buffer, int iDef)
-	{
-		
+	{		
 		switch(subtype)
 		{
 			case NOUN_PLURAL:
@@ -130,42 +170,46 @@ public class Definition {
 				buffer.append(";").append(iDef).append(": ");
 				if( bLiteral )
 				{
-					buffer.append(text).append(Util.LF);
+					buffer.append(getText()).append(Util.LF);
 				}
 				else
 				{
-					buffer.append("{{forma sustantivo plural|").append(text).append("|en}}.").append(Util.LF);
+					buffer.append("{{forma sustantivo plural|").append(getText()).append("|en}}.").append(Util.LF);
 				}
 				appendSyns(buffer);				
 				++iDef;				
 				break;
 			case PLACE:
 				buffer.append(";").append(iDef).append(": ");
-				buffer.append(text).append(Util.LF);
+				buffer.append(getText());
+				if( hasParentText() )
+				{
+					buffer.append(", ").append(getParentText());
+				}
+				buffer.append(Util.LF);
 				++iDef;				
 				break;
 			case VERB_3S:
 				appendLevel4(buffer, gramcat.wikitext);				
 				buffer.append(";").append(iDef).append(": ");
-				buffer.append("{{forma verbo-en|").append(text).append("|3s|presente}}.").append(Util.LF);
+				buffer.append("{{forma verbo-en|").append(getText()).append("|3s|presente}}.").append(Util.LF);
 				++iDef;				
 				break;
 			case VERB_ING:
 				appendLevel4(buffer, gramcat.wikitext);				
 				buffer.append(";").append(iDef).append(": ");
-				buffer.append("{{participio|leng=en|").append(text).append("|presente}}.").append(Util.LF);
+				buffer.append("{{participio|leng=en|").append(getText()).append("|presente}}.").append(Util.LF);
 				++iDef;				
 				break;
 			case VERB_ED:
 				appendLevel4(buffer, gramcat.wikitext);				
 				buffer.append(";").append(iDef).append(": ");
-				buffer.append("{{forma verbo-en|").append(text).append("|pasado}}.").append(Util.LF);
+				buffer.append("{{forma verbo-en|").append(getText()).append("|pasado}}.").append(Util.LF);
 				++iDef;
 				buffer.append(";").append(iDef).append(": ");				
-				buffer.append("{{forma verbo-en|").append(text).append("|participio}}.").append(Util.LF);			
+				buffer.append("{{forma verbo-en|").append(getText()).append("|participio}}.").append(Util.LF);			
 				++iDef;				
-				break;
-				
+				break;				
 			case SURNAME:
 				buffer.append(";").append(iDef).append(": ");
 				buffer.append("{{apellido|leng=en}}.").append(Util.LF);
@@ -188,12 +232,12 @@ public class Definition {
 				break;
 			case GN_DIMINUTIVE:
 				buffer.append(";").append(iDef).append(": ");					
-				buffer.append("{{hipocorístico|leng=en|").append(text).append("}}.").append(Util.LF);
+				buffer.append("{{hipocorístico|leng=en|").append(getText()).append("}}.").append(Util.LF);
 				++iDef;					
 				break;	
 			case NOUN_PROPER:
 				buffer.append(";").append(iDef).append(": ");
-				buffer.append(text).append(Util.LF);
+				buffer.append(getText()).append(Util.LF);
 				
 				appendSyns(buffer);
 				++iDef;
@@ -202,11 +246,11 @@ public class Definition {
 				buffer.append(";").append(iDef).append(": ");
 				if(bNoLink)
 				{
-					buffer.append(text).append(".").append(Util.LF);
+					buffer.append(getText()).append(".").append(Util.LF);
 				}
 				else
 				{
-					buffer.append("{{plm|").append(text).append("}}.").append(Util.LF);
+					buffer.append("{{plm|").append(getText()).append("}}.").append(Util.LF);
 				}
 				appendSyns(buffer);				
 				++iDef;				
@@ -215,11 +259,11 @@ public class Definition {
 				buffer.append(";").append(iDef).append(": ");
 				if(bNoLink)
 				{
-					buffer.append(text).append(".").append(Util.LF);
+					buffer.append(getText()).append(".").append(Util.LF);
 				}
 				else
 				{
-					buffer.append("{{plm|").append(text).append("}}.").append(Util.LF);
+					buffer.append("{{plm|").append(getText()).append("}}.").append(Util.LF);
 				}
 				appendSyns(buffer);			
 				

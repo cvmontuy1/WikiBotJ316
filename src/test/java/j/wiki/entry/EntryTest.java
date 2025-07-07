@@ -2,6 +2,7 @@ package j.wiki.entry;
 
 import org.junit.jupiter.api.*;
 
+import j.wiki.Util;
 import j.wiki.parser.ParserEntry;
 import j.wiki.parser.ParserTest;
 
@@ -9,6 +10,44 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 public class EntryTest {
+	@Test
+	public void testMaxie()
+	{
+		Entry entry;
+		ParserEntry pentry = new ParserEntry("en", "Maxie", ParserTest.WIKITEXT_MAXIE);	
+		entry = En2Es.buildEntry("", pentry);
+		
+		assertTrue(entry.getEtimCount() == 1);	
+		assertTrue(entry.getDefsCount() == 2);
+		assertTrue(entry.getPronCount() == 0);
+		Util.report("**********Maxie:\n", entry.toWiki());
+	}
+	
+	@Test
+	public void testWallace()
+	{
+		Entry entry;
+		ParserEntry pentry = new ParserEntry("en", "Wallace", ParserTest.WIKITEXT_WALLACE);	
+		entry = En2Es.buildEntry("", pentry);
+		
+		assertTrue(entry.getEtimCount() == 1);
+		assertTrue(entry.getDefsCount() == 19);	
+		assertTrue(entry.getDefTxt(19).contains("Una localidad en el condado de Harrison, Virginia del Este, Estados Unidos"));
+		//Util.report("**********Wallace:\n", entry.toWiki());
+	}	
+	
+	@Test
+	public void testSpirits()
+	{
+		Entry entry;
+		ParserEntry pentry = new ParserEntry("en", "spirits", ParserTest.WIKITEXT_SPIRITS);	
+		entry = En2Es.buildEntry("", pentry);
+
+		assertTrue(entry.getEtimCount() == 1);	
+		assertTrue(entry.getDefsCount() == 2);
+
+		//		//Util.report("**********Spirits:\n", entry.toWiki());
+	}
 
 	@Test
 	public void testCharly()
@@ -17,8 +56,9 @@ public class EntryTest {
 		ParserEntry pentry = new ParserEntry("en", "Charly", ParserTest.WIKITEXT_CHARLY);	
 		entry = En2Es.buildEntry("", pentry);
 		
-		System.out.println(entry.getDefTxt(1));
-		System.out.println(entry.toWiki());
+		Util.report("**********Charly:\n", entry.toWiki());
+		//System.out.println(entry.getDefTxt(1));
+		//System.out.println(entry.toWiki());
 		
 		assertTrue(entry.getDefsCount()== 3);
 		assertTrue(entry.getEtimCount() == 1);
@@ -56,7 +96,7 @@ public class EntryTest {
 		ParserEntry pentry = new ParserEntry("en", "Test", ParserTest.WIKITEXT1);	
 		entry = En2Es.buildEntry("", pentry);
 		
-		System.out.println(entry.toWiki());
+		//System.out.println(entry.toWiki());
 	}
 
 	@Test	
@@ -66,8 +106,8 @@ public class EntryTest {
 		ParserEntry pentry = new ParserEntry("en", "Hanna", ParserTest.WIKITEXT_HANNA);	
 		entry = En2Es.buildEntry("", pentry);
 		
-		System.out.println(entry.toWiki());
-		System.out.println("Hanna def1:" + entry.getDefTxt(1));
+		Util.report("**********Hanna:\n", entry.toWiki());
+		//System.out.println("Hanna def1:" + entry.getDefTxt(1));
 		
 		assertTrue(entry.getEtimCount()==2);	
 		assertTrue(entry.getDefsCount()==13);
@@ -77,7 +117,7 @@ public class EntryTest {
 	}
 
 	
-	
+
 	//@Test
 	public void testMRI()
 	{
@@ -85,7 +125,9 @@ public class EntryTest {
 		ParserEntry pentry = new ParserEntry("en", "MRI", ParserTest.WIKITEXT_MRI);	
 		entry = En2Es.buildEntry("", pentry);
 		
-		System.out.println(entry.toWiki());
+		//System.out.println("MRI etim count:" + entry.getEtimCount());
+		
+		assertTrue(entry.getEtimCount() == 1);
 	}
 
 }

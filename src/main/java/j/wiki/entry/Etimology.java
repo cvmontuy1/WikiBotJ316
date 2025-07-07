@@ -25,7 +25,7 @@ import java.util.List;
 import j.wiki.Util;
 
 public class Etimology {
-	public int iEtim;	// Número de etimologia
+	private int iEtim;	// Número de etimologia
 	public enum Type { UNKNOWN, INITIALS };
 	public Etimology.Type type;
 	public String text;
@@ -48,6 +48,15 @@ public class Etimology {
 		return etim;
 	}
 	
+	public int getEtimId()
+	{
+		return iEtim;
+	}
+	public void setEtimId(int iEtim)
+	{
+		this.iEtim = iEtim; 
+	}
+	
 	public void add(GramCatContainer gc_cont)
 	{
 		gc_conts.add(gc_cont);
@@ -55,7 +64,10 @@ public class Etimology {
 	
 	public void addEtimLang(EtimLang etimlang)
 	{
-		etims.add(etimlang);
+		if( etimlang.isComplete() )
+		{
+			etims.add(etimlang);
+		}
 	}
 	
 	public boolean hasDefs()
@@ -168,17 +180,17 @@ public class Etimology {
 	
 	public void toWiki(StringBuilder buffer)
 	{
-		String PREFIX = "{{etimología|leng=en|";
-		String PREFIX2 = "{{etim|leng=en|";
-		String SUFIX = "}}";
+		final String WIKI_PREFIX = "{{etimología|leng=en|";
+		final String WIKI_PREFIX2 = "{{etim|leng=en|";
+		final String WIKI_SUFIX = "}}";
 		int iEtim;
 		
 		switch(type)
 		{
 			case Type.INITIALS:
-				buffer.append(PREFIX);				
+				buffer.append(WIKI_PREFIX);				
 				buffer.append("siglas|").append(text).append("|nl=s");
-				buffer.append(SUFIX);
+				buffer.append(WIKI_SUFIX);
 				buffer.append(".");
 				break;
 			default:
@@ -187,38 +199,50 @@ public class Etimology {
 					iEtim = 0;
 					for( EtimLang eti : etims)
 					{
-						if( iEtim == 0)
+						if( eti.type == EtimLang.Type.SUFFIX )
 						{
-							buffer.append(PREFIX);							
-						}
-						else
-						{
-							buffer.append(", y este ");
-							buffer.append(PREFIX2);
-						}
-						buffer.append(eti.lang).append("|");
-						if( !Util.isLinked(eti.text) && Util.isSingleWord(eti.text) )
-						{
-							buffer.append(Util.link(eti.text));
-						}
-						else
-						{
+							buffer.append(WIKI_PREFIX);
+							buffer.append("sufijo|");
 							buffer.append(eti.text);
+							buffer.append("|");
+							buffer.append(eti.suffix);
+							buffer.append(WIKI_SUFIX);							
 						}
-						buffer.append("|nl=s");		
-						if( Util.isNotNullOrEmpty(eti.transliteration) )
+						else
 						{
-							buffer.append("|tr=").append(eti.transliteration);
-						}
-						buffer.append(SUFIX);						
+							if( iEtim == 0)
+							{
+								buffer.append(WIKI_PREFIX);
+							}
+							else
+							{
+								buffer.append(", y este ");
+								buffer.append(WIKI_PREFIX2);
+							}
+							buffer.append(eti.getLang()).append("|");
+							if( !Util.isLinked(eti.text) && Util.isSingleWord(eti.text) )
+							{
+								buffer.append(Util.link(eti.text));
+							}
+							else
+							{
+								buffer.append(eti.text);
+							}
+							buffer.append("|nl=s");		
+							if( Util.isNotNullOrEmpty(eti.transliteration) )
+							{
+								buffer.append("|tr=").append(eti.transliteration);
+							}
+							buffer.append(WIKI_SUFIX);
+						}						
 						++iEtim;
 					}
 					buffer.append(".");					
 				}
 				else
 				{
-					buffer.append(PREFIX);					
-					buffer.append(SUFIX);
+					buffer.append(WIKI_PREFIX);					
+					buffer.append(WIKI_SUFIX);
 					buffer.append(".");
 				}
 				break;

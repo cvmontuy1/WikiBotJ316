@@ -19,26 +19,63 @@
 
 package j.wiki.entry;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import j.wiki.Util;
+
 public class EtimLang {
-	public enum Type { BORROWED, SUFIX, PREFIX, DEFAULT};
+	public enum Type { BORROWED, SUFFIX, PREFIX, DEFAULT};
 	public Type type;
-	public String lang;		
+	private String lang;		
 	public String text;
+	public String suffix;
 	public String transliteration; // transliteration
 	
 	public EtimLang(Type type, String lang, String text)
 	{
 		this.type = type;
-		this.lang = lang;
+		if( mapLang.containsKey(lang) )
+		{
+			this.lang = mapLang.get(lang);
+		}
+		else
+		{
+			this.lang = lang;
+		}
+		
 		this.text = text;
 	}
 
 	public EtimLang(Type type, String lang, String text, String tran)
 	{
-		this.type = type;
-		this.lang = lang;
-		this.text = text;
+		this(type, lang, text);
 		this.transliteration = tran;
 	}
 	
+	public static EtimLang buildSuffix(String lang, String text, String suffix)
+	{
+		EtimLang etimlang;
+		
+		etimlang = new EtimLang(Type.SUFFIX, lang, text);
+		etimlang.suffix = suffix;
+		
+		return etimlang;
+	}
+	
+	public boolean isComplete()
+	{
+		return Util.isNotNullOrEmpty(lang) && Util.isNotNullOrEmpty(text) && !"-".equals(text); 
+	}
+	
+	public String getLang()
+	{
+		return lang;
+	}
+	
+	private static Map<String, String> mapLang = new HashMap<String, String>();
+	static
+	{
+		mapLang.put("xno", "fro");
+	};
 }
