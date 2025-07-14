@@ -155,6 +155,21 @@ public class Util {
 		return buffer.toString();
 	}
 	
+	 public static String getLastWord(String input) 
+	 {
+		String word;
+		 
+		if (input == null || input.trim().isEmpty()) {
+		    word = ""; // Return empty if input is null or only whitespace
+		}
+		else
+		{
+			String[] words = input.trim().split("\\s+");
+			word = words[words.length - 1];
+		}
+		return word;
+	  }
+	
 	
 	public final static String LF = "\r\n";
 }

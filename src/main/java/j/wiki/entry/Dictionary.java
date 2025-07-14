@@ -27,10 +27,6 @@ import j.wiki.Util;
 
 public class Dictionary 
 {
-	public static final char MASCULINE = 'm';
-	public static final char FEMENINE = 'f';
-	public static final char NEUTRE = 'n';
-
 	public static GenreName get(String english, boolean bForced)
 	{
 		GenreName genrename;
@@ -45,14 +41,21 @@ public class Dictionary
 			}
 			else
 			{
-				if( bForced )
+				if( mapCountry.containsKey(english))
 				{
-					genrename = null;
+					genrename = mapCountry.get(english);
 				}
 				else
 				{
-					english = Util.concatenate(TextParser.filterConnectors(english));
-					genrename = new GenreName(english, NEUTRE);
+					if( bForced )
+					{
+						genrename = null;
+					}
+					else
+					{
+						english = Util.concatenate(TextParser.filterConnectors(english));
+						genrename = new GenreName(english, Genre.NEUTRE, true);
+					}
 				}
 			}		
 		}
@@ -64,131 +67,169 @@ public class Dictionary
 		return genrename; 
 	}
 	
+	public static boolean isCountry(String english)
+	{
+		return mapCountry.containsKey(english);
+	}
+	
 	public static boolean contains(String english)
 	{
-		return map.containsKey(english);
+		return map.containsKey(english) || isCountry(english);
 	}
 
+	// *************************************************************************	
+//		private section
+	
+	
 	static 
 	{
 		
-		// States
 		map = new HashMap<String, GenreName>();
+		mapCountry = new HashMap<String, GenreName>();
 
 		
 		// Generic places
-		put("barangay", "barrio", MASCULINE);
-		put("borough", "distrito", MASCULINE);
-		put("CDP", "localidad", FEMENINE);  //  census-designated place 
-		put("city", "ciudad", FEMENINE);		
-		put("city-state", "ciudad estado", FEMENINE);
-		put("county", "condado", MASCULINE);
-		put("county seat", "Sede de condado", NEUTRE);
-		put("country", "país", MASCULINE);
-		put("community", "comunidad", FEMENINE);
-		put("ghost town", "pueblo fantasma", MASCULINE);
-		put("gulf", "golfo", MASCULINE);
-		put("hamlet", "caserio", MASCULINE);
-		put("island", "isla", FEMENINE);		
-		put("lake", "lago", MASCULINE);
+		put("barangay", "barrio", Genre.MASCULINE);
+		put("borough", "distrito", Genre.MASCULINE);
+		put("capital city", "capital", Genre.FEMENINE, false /* definite La capital */);
+		put("CDP", "localidad", Genre.FEMENINE);  //  census-designated place 
+		put("city", "ciudad", Genre.FEMENINE);	
+		put("civil parish", "territorio", Genre.MASCULINE);
+		put("city-state", "ciudad estado", Genre.FEMENINE);
+		put("council area", "área municipal", Genre.FEMENINE);		
+		put("county", "condado", Genre.MASCULINE);
+		put("county seat", "sede", Genre.FEMENINE, false);
+		put("country", "país", Genre.MASCULINE);
+		put("community", "comunidad", Genre.FEMENINE);
+		put("electoral division", "distrito", Genre.MASCULINE);
+		put("ghost town", "pueblo fantasma", Genre.MASCULINE);
+		put("gulf", "golfo", Genre.MASCULINE);
+		put("hamlet", "caserio", Genre.MASCULINE);
+		put("island", "isla", Genre.FEMENINE);		
+		put("lake", "lago", Genre.MASCULINE);
 		
-		put("locality", "localidad", FEMENINE);	
-		put("locale", "lugar", MASCULINE);
-		put("megacity", "megalópolis", FEMENINE);
-		put("monarchy", "monarquía", FEMENINE);
-		put("municipality", "municipio", MASCULINE);
-		put("national capital", "capital nacional", FEMENINE);		
-		put("national park", "parque nacional", MASCULINE);		
-		put("neighborhood", "vecindario", MASCULINE);		
-		put("ocean", "oceano", MASCULINE);
+		put("locality", "localidad", Genre.FEMENINE);	
+		put("locale", "lugar", Genre.MASCULINE);
+		put("market town", "pueblo", Genre.MASCULINE);
+		put("megacity", "megalópolis", Genre.FEMENINE);
+		put("monarchy", "monarquía", Genre.FEMENINE);
+		put("municipality", "municipio", Genre.MASCULINE);
+		put("national capital", "capital nacional", Genre.FEMENINE);		
+		put("national park", "parque nacional", Genre.MASCULINE);		
+		put("neighborhood", "vecindario", Genre.MASCULINE);		
+		put("neighbourhood", "vecindario", Genre.MASCULINE);
+		put("number of places", "varios lugares");
+		put("number places", "varios lugares");
+		put("ocean", "oceano", Genre.MASCULINE);
+		put("outer northern suburb", "suburbio", Genre.MASCULINE);
+		put("park", "parque", Genre.MASCULINE);		
+		put("port", "puerto", Genre.MASCULINE);		
+		put("port city", "ciudad portuaria", Genre.FEMENINE );
+		put("prefecture", "prefectura", Genre.FEMENINE);
+		put("protectorate", "protectorado", Genre.MASCULINE);
+		put("province", "provincia", Genre.FEMENINE);		
 		
-		put("park", "parque", MASCULINE);		
-		put("port", "puerto", MASCULINE);		
-		put("prefecture", "prefectura", FEMENINE);
-		put("protectorate", "protectorado", MASCULINE);
-		put("province", "provincia", FEMENINE);		
-		
-		put("region", "región", FEMENINE);
-		put("republic", "república", FEMENINE);
-		put("rural municipality", "municipio", MASCULINE);
+		put("region", "región", Genre.FEMENINE);
+		put("republic", "república", Genre.FEMENINE);
+		put("river", "río", Genre.MASCULINE);
+		put("sea", "mar", Genre.MASCULINE);
+		put("seat", "sede", Genre.FEMENINE, false /* definite */);
+		put("settlement", "asentamiento", Genre.MASCULINE);
 		put("several", "varios");	
-		put("small city", "ciudad", FEMENINE);		
-		put("small town", "poblado", MASCULINE);
-		put("state capital", "capital estatal", FEMENINE);
-		put("state park", "parque estatal", MASCULINE);
-		put("statutory town", "pueblo", MASCULINE);
-		put("statutory city", "ciudad", MASCULINE);
-		put("town", "pueblo", MASCULINE);		
-		put("township", "municipio", MASCULINE);
-		put("twp", "municipio", MASCULINE);
-		put("unincorporated community", "comunidad", FEMENINE);
-		put("ucomm", "comunidad", FEMENINE);
-		put("valley", "valle", MASCULINE);
-		put("village", "villa", FEMENINE);
-		put("volcano", "volcán", MASCULINE);
-		put("zone", "zona", FEMENINE);
+		put("state capital", "capital estatal", Genre.FEMENINE);
+		put("state park", "parque estatal", Genre.MASCULINE);
+		put("suburb", "suburbio", Genre.MASCULINE);
+		put("town", "pueblo", Genre.MASCULINE);
+		put("town/seat", "sede", Genre.FEMENINE, false /* definite */);
+		put("townland", "townland", Genre.MASCULINE );
+		put("township", "municipio", Genre.MASCULINE);
+		put("twp", "municipio", Genre.MASCULINE);
+		put("ucomm", "comunidad", Genre.FEMENINE);
+		put("valley", "valle", Genre.MASCULINE);
+		put("village", "villa", Genre.FEMENINE);
+		put("volcano", "volcán", Genre.MASCULINE);
+		put("zone", "zona", Genre.FEMENINE);
 
 		
 	
 		// Countries that uses English
-		put("Australia");
-		put("Barbados");	
-		put("Bahamas", "Bahamas");
-		put("Belice");
-		put("Canada", "Canadá");
-		put("England", "Inglaterra");
-		put("Guyana");
-		put("Ireland", "Irlanda");
-		put("India");
-		put("Jamaica");
-		put("Kenya", "Kenia");
-		put("Puerto Rico");		
-		put("Liberia");
-		put("New Zealand", "Nueva Zelanda");
-		put("UK", "Reino Unido");		
-		put("United Kingdom", "Reino Unido");
-		put("United States", "Estados Unidos");
-		put("United States of America", "Estados Unidos");		
-		put("USA", "Estados Unidos");
-		put("US", "Estados Unidos");
-		put("Republic of Zambia", "Zambia");		
-		put("Scotland", "Escocia");
-		put("South Africa", "Sudáfrica");
-		put("Trinidad and Tobago", "Trinidad y Tobago");
-		put("Zambia");
+		putCountry("Australia");
+		putCountry("Barbados");	
+		putCountry("Bahamas", "Bahamas");
+		putCountry("Belice");
+		putCountry("Canada", "Canadá");
+		putCountry("England", "Inglaterra");
+		putCountry("Guyana");
+		putCountry("Ireland", "Irlanda");
+		putCountry("India");
+		putCountry("Jamaica");
+		putCountry("Kenya", "Kenia");
+		putCountry("Puerto Rico");		
+		putCountry("Liberia");
+		putCountry("New Zealand", "Nueva Zelanda");
+		putCountry("UK", "Reino Unido");		
+		putCountry("United Kingdom", "Reino Unido");
+		putCountry("United States", "Estados Unidos");
+		putCountry("United States of America", "Estados Unidos");		
+		putCountry("USA", "Estados Unidos");
+		putCountry("US", "Estados Unidos");
+		putCountry("Republic of Zambia", "Zambia");		
+		putCountry("Scotland", "Escocia");
+		putCountry("South Africa", "Sudáfrica");
+		putCountry("Trinidad and Tobago", "Trinidad y Tobago");
+		putCountry("Zambia");
 		
 		// Other countries
-		put("Albania");
-		put("Austria");
-		put("Belgium", "Bélgica");
-		put("Bulgaria");
-		put("Croatia", "Croacia");
-		put("Denmark", "Dinamarca");
-		put("Estonia");
-		put("Finland", "Finlandia");
-		put("France", "Francia");
-		put("Greece", "Grecia");
-		put("Germany", "Alemania");
-		put("Hungary", "Hungria");		
-		put("Iceland", "Islandia");
-		put("Italy", "Italia");
-		put("Liechtenstein", "Liechtenstein");		
-		put("Lithuania", "Lituania");
-		put("Luxembourg", "Luxemburgo");
-		put("Malta");		
-		put("Monaco");
-		put("Montenegro");	
-		put("Netherlands", "Holanda");
-		put("Norway", "Noruega");
-		put("Poland", "Polonia");
-		put("Portugal");
-		put("Romania", "Rumania");
-		put("Russia", "Rusia");
-		put("Spain", "España");
-		put("Sweden", "Suecia");
-		put("Switzerland", "Suiza");
-		put("Turkey", "Turquía");
-		put("Vatican City", "Ciudad del Vaticano");
+		putCountry("Albania");
+		putCountry("Austria");
+		putCountry("Argentina");
+		putCountry("Belgium", "Bélgica");
+		putCountry("Bulgaria");
+		putCountry("Brazil", "Brasil");
+		putCountry("Colombia", "Colombia");		
+		putCountry("China","China");
+		putCountry("Congo");
+		putCountry("Croatia", "Croacia");
+		putCountry("Cuba", "Cuba");
+		putCountry("Denmark", "Dinamarca");
+		putCountry("Egypt", "Egipto"); 
+		putCountry("Estonia");
+		putCountry("Ethiopia", "Etiopía");
+		putCountry("Finland", "Finlandia");
+		putCountry("France", "Francia");
+		putCountry("Greece", "Grecia");
+		putCountry("Germany", "Alemania");
+		putCountry("Greenland", "Groenlandia");
+		putCountry("Guatemala");	
+		putCountry("Honduras");		
+		putCountry("Hungary", "Hungria");		
+		putCountry("Iceland", "Islandia");
+		putCountry("India");
+		putCountry("Iraq", "Irak");
+		putCountry("Italy", "Italia");
+		putCountry("Japan", "Japón");
+		putCountry("Liechtenstein", "Liechtenstein");		
+		putCountry("Lithuania", "Lituania");
+		putCountry("Luxembourg", "Luxemburgo");
+		putCountry("Malta");
+		putCountry("Mexico", "México");
+		putCountry("Monaco");
+		putCountry("Montenegro");	
+		putCountry("Netherlands", "Holanda");
+		putCountry("Nicaragua");
+		putCountry("Norway", "Noruega");
+		putCountry("Panama", "Panamá");
+		putCountry("Peru", "Perú");
+		putCountry("Poland", "Polonia");
+		putCountry("Portugal");
+		putCountry("Romania", "Rumania");
+		putCountry("Russia", "Rusia");
+		putCountry("Spain", "España");
+		putCountry("Sweden", "Suecia");
+		putCountry("Switzerland", "Suiza");
+		putCountry("South America", "Sudamérica");
+		putCountry("Turkey", "Turquía");
+		putCountry("Vatican City", "Ciudad del Vaticano");
 		
 		
 
@@ -219,8 +260,9 @@ public class Dictionary
 		put("Colorado");
 		put("Delaware");
 		put("Florida");
+
 		put("Georgia");
-		put("Hawaii", "Hawái");
+		put("Hawaii", "Hawái");	
 		put("Idaho");
 		put("Illinois");
 		put("Indiana");
@@ -262,45 +304,68 @@ public class Dictionary
 		put("Wyoming");
 		put("Washington DC");
 		put("Washington D.C.");		
+		
+		
+		// Ciudades
+		put("London", "Londres");
 		 
 	}
 	
 
 	
-// *************************************************************************	
-//	private section
 	private static void put(String strValue)
 	{
-		put(strValue, strValue, NEUTRE);
+		put(strValue, strValue, Genre.NEUTRE, true /* indefinido */);
 	}
 
 	private static void put(String strValue, String spanish)
 	{
-		put(strValue, spanish, NEUTRE);
+		put(strValue, spanish, Genre.NEUTRE, true /* indefinite */);
 	}
 	
-	private static void put(String strValue, char gender)
+	private static void put(String english, String spanish, Genre genre)
 	{
-		put(strValue, strValue, gender);
+		put(english, spanish, genre, true /* indefinite */);		
+	}
+	
+	private static void put(String english, String spanish, Genre genre, boolean bIndefinite)
+	{
+		map.put(english, new GenreName(spanish, genre, bIndefinite));		
+	}
+	
+	private static void putCountry(String english, String spanish)
+	{
+		mapCountry.put(english,  new GenreName(spanish, Genre.NEUTRE, true));
+	}
+	
+	private static void putCountry(String english)
+	{
+		mapCountry.put(english,  new GenreName(english, Genre.NEUTRE, true));
 	}
 
-	private static void put(String english, String spanish, char gender)
-	{
-		map.put(english, new GenreName(spanish, gender));		
-	}
-	
-	
 	public static class GenreName
 	{
-		char genre;
+		Genre genre;
 		String name;
+		boolean indefinite;
 		
-		public GenreName(String name, char genre)
+		public GenreName(String name, Genre genre, boolean indefinite)
 		{
 			this.name = name;
 			this.genre = genre;
+			this.indefinite = indefinite;
+		}
+		
+		public String toString()
+		{
+			StringBuilder buffer = new StringBuilder();
+			
+			buffer.append("name:").append(name).append(" genre:").append(genre.toString());
+			
+			return buffer.toString();
 		}
 	}
 	
 	private static Map<String, GenreName> map;	
+	private static Map<String, GenreName> mapCountry;
 }

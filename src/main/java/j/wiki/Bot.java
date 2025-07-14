@@ -34,9 +34,8 @@ import org.wikipedia.Wiki;
  * Project version: 1.1g
  * Main program
  * Executes a task
- * @author CarlosVM
  * TODOS: 
- * 		Fix alphabet phonetic int // or []
+ * 		
  */
 public class Bot {
 	final static String ES_DOMAIN = "es.wiktionary.org";
@@ -51,8 +50,9 @@ public class Bot {
 	
 	/**
 	 * Program entry point
-	 * @param args :  user password filepath UPDATE OVERWRITE
+	 * @param args :  user password filepath [UPDATE] [OVERWRITE]
 	 * If UPDATE is not present it does not changes anything 
+	 * if OVERWRITE is not present it does not overwrite an existing entry
 	 */
 	public static void main(String[] args)
 	{
@@ -154,8 +154,7 @@ public class Bot {
 			es_wiki.logout();
 		}
 		Util.report("End processing");
-	}
-	
+	}	
 
 	/***
 	 * Sets logging level at system level
@@ -168,6 +167,5 @@ public class Bot {
 		    h.setLevel(Level.SEVERE);
 		}
 	}
-
     
 }

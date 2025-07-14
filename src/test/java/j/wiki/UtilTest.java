@@ -25,5 +25,9 @@ public class UtilTest {
 		assert(!Util.isLinked("[https...]"));		
 		assert(Util.isLinked("[[https]]"));		
 
+		assert( Util.getLastWord(null).equals(""));
+		assert( Util.getLastWord("").equals(""));
+		assert( Util.getLastWord("word").equals("word"));
+		assert( Util.getLastWord("The word").equals("word"));
 	}
 }

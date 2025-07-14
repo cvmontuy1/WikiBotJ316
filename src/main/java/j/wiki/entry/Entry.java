@@ -374,6 +374,10 @@ public class Entry {
 		
 		if( !place.isEmpty() )
 		{
+			if( place.getText().contains("England") )
+			{
+				Util.report("here");
+			}
 			addDefinition(iEtim, GramCat.Subtype.PLACE, place, false);
 		}
 	}

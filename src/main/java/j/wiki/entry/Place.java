@@ -55,6 +55,8 @@ public class Place extends TextSrc {
 	{
 		StringBuilder buffer = new StringBuilder();
 		TypeName tname;
+		boolean bIndefinite = true;
+		boolean bCountry = false;
 		
 		for(int iName = 0; iName < names.size(); ++iName )
 		{
@@ -62,36 +64,87 @@ public class Place extends TextSrc {
 			switch( iName )
 			{
 				case 0:
-					if( !bHasChildren )
+					if( !bHasChildren || names.size() == 1 )
 					{
 						switch( tname.genrename.genre )
 						{
-							case 'm':
-								buffer.append("Un ");
+							case Genre.MASCULINE:
+								if( tname.genrename.indefinite )
+								{
+									bIndefinite = true;
+									buffer.append("Un ");
+								}
+								else
+								{
+									bIndefinite = false;									
+									buffer.append("El ");
+								}
 								break;
-							case 'f':
-								buffer.append("Una ");						
+							case Genre.FEMENINE:
+								if( tname.genrename.indefinite )
+								{								
+									bIndefinite = true;									
+									buffer.append("Una ");
+								}
+								else
+								{
+									bIndefinite = false;									
+									buffer.append("La ");
+								}
 								break;
-							case 'n':
+							case Genre.NEUTRE:
 								break;
 						}
 						buffer.append(tname.genrename.name);						
 					}
 					break;
 				case 1:
-					if( !bHasChildren )
+					if( !bHasChildren )					
 					{					
-						buffer.append(" en ");
+						if( bIndefinite )
+						{
+							buffer.append(" en ");
+						}
+						else
+						{
+							buffer.append(" de ");
+						}
 					}
-					if( tname.type.equals(TYPE_COUNTY) )
+					if( tname.type != null && tname.type.isVisible() )
 					{
-						buffer.append("el ");
+						switch( tname.type.genre)
+						{
+							case MASCULINE:
+								buffer.append("el ");
+								break;
+							case FEMENINE:
+								buffer.append("la ");
+								break;
+							case NEUTRE:
+								break;
+						}
+						buffer.append(tname.type.type);
+						buffer.append(" ");
+						if( tname.type.preposition)
+						{
+							buffer.append("de ");
+						}
+					}
+					if( tname != null && tname.type != null && tname.type.type != null)
+					{
+						if( "país".equals(tname.type.type ) )
+						{
+							bCountry = true;
+						}
 					}
 					buffer.append(tname.genrename.name);
 					break;
 				default:
-					buffer.append(", ");
-					buffer.append(tname.genrename.name);
+					if( !bCountry )
+					{
+						buffer.append(", ");
+						buffer.append(tname.genrename.name);
+					}
 					break;
 			}
 		}
@@ -115,8 +168,8 @@ public class Place extends TextSrc {
 				words = text.split("/");
 				if( words.length == 2)
 				{
-					typename.code = words[0];
-					typename.name = words[1];					
+					typename.code = Util.getLastWord(words[0]);
+					typename.name = TextParser.filterPlaceType(words[1]);					
 				}
 				else
 				{
@@ -135,68 +188,109 @@ public class Place extends TextSrc {
 			else
 			{
 				typename.code = "";
-				typename.name = text;				
-			}
+				typename.name = TextParser.filterPlaceType(text);
+				if( Dictionary.isCountry(typename.name) )
+				{
+					typename.type = new PlaceType("país");
+				}
+			}			
+			
 			switch(typename.code)
 			{
 				case "c":
-					typename.type = "pais";
+				case "cc":					
+					typename.type = new PlaceType("pais");
 					break;
 				case "carea":
-					typename.type = "área";
+					typename.type = new PlaceType("área", Genre.MASCULINE);
 					break;
 				case "city":
-					typename.type = "ciudad";
+					typename.type = new PlaceType("ciudad");
 					break;
-				case "cc":
 				case "co":
-					typename.type = TYPE_COUNTY;
+					typename.type = new PlaceType("condado", Genre.MASCULINE);
 					if( Util.isNotNullOrEmpty(typename.name) )
 					{
 						typename.name = typename.name.replace("county", "");
 						typename.name = typename.name.replace("County", "");
-						typename.name = "condado de " + typename.name.trim();
+						typename.name = typename.name.trim();
 					}
 					break;					
 				case "cont":
-					typename.type = "continente";
+					typename.type = new PlaceType("continente");
 					break;					
 				case "dept":
-					typename.type = "departamento";
+					typename.type = new PlaceType("departamento", Genre.MASCULINE, false);
 					break;					
 				case "dist":
-					typename.type = "district";
+					typename.type = new PlaceType("distrito", Genre.MASCULINE, false);
 					break;					
 				case "riv":
-					typename.type = "rio";
+					typename.type = new PlaceType("rio", Genre.MASCULINE, false);
 					break;					
 				case "cdp":
 				case "CDP":
-					typename.type = "lugar designado por el censo";
+					typename.type = new PlaceType("lugar designado por el censo");
 					break;		
 				case "p":
-					typename.type = "provincia";
+					typename.type = new PlaceType("provincia", Genre.FEMENINE);
 					break;
 				case "r":
-					typename.type = "región";
+					typename.type = new PlaceType("región", Genre.FEMENINE);
 					break;
 				case "s":
-					typename.type = "estado";
-					break;					
+					typename.type = new PlaceType("estado", Genre.MASCULINE, true);
+					break;		
+				case "town":
+					typename.type = new PlaceType("pueblo");
+					break;
 				default:
-					typename.type = "";
+					break;
 					
 			}
-			typename.genrename = Dictionary.get(typename.name, bForced || typename.type == "");
+			typename.genrename = Dictionary.get(typename.name, bForced || typename.type == null);
 		}
 		return typename;
+	}
+	
+	private static class PlaceType
+	{
+		String type;  // Ciudad, Estado, Pais
+		Genre  genre;
+		boolean preposition;
+		
+		public PlaceType(String type)
+		{
+			this.type = type;
+			this.genre = null;
+			this.preposition = false;
+		}
+
+		public PlaceType(String type, Genre genre)
+		{
+			this.type = type;
+			this.genre = genre;
+			this.preposition = true;			
+		}
+		
+		public PlaceType(String type, Genre genre, boolean preposition)
+		{
+			this.type = type;
+			this.genre = genre;
+			this.preposition = preposition;			
+		}
+
+		public boolean isVisible()
+		{
+			return genre != null;
+		}
 	}
 
 	
 	private static class TypeName
 	{
 		String code;
-		String type;  // Ciudad, Estado, Pais
+		PlaceType type;
 		String name;
 		Dictionary.GenreName genrename;
 		
@@ -206,7 +300,6 @@ public class Place extends TextSrc {
 		}
 	}
 	
-	private final static String TYPE_COUNTY = "county";
 	private TypeName name;
 	private List<TypeName> names;	
 }

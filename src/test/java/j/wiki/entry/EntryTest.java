@@ -17,10 +17,13 @@ public class EntryTest {
 		ParserEntry pentry = new ParserEntry("en", "Maxie", ParserTest.WIKITEXT_MAXIE);	
 		entry = En2Es.buildEntry("", pentry);
 		
+		//Util.report("**********Maxie:\n", entry.toWiki());
+		
 		assertTrue(entry.getEtimCount() == 1);	
 		assertTrue(entry.getDefsCount() == 2);
 		assertTrue(entry.getPronCount() == 0);
-		Util.report("**********Maxie:\n", entry.toWiki());
+		assertTrue(entry.getDefTxt(1).contains(";1: {{hipocorístico|leng=en|Max}}."));
+		assertTrue(entry.getDefTxt(2).contains(";1: {{hipocorístico|leng=en|Maxine}}."));		
 	}
 	
 	@Test
@@ -56,7 +59,7 @@ public class EntryTest {
 		ParserEntry pentry = new ParserEntry("en", "Charly", ParserTest.WIKITEXT_CHARLY);	
 		entry = En2Es.buildEntry("", pentry);
 		
-		Util.report("**********Charly:\n", entry.toWiki());
+		//Util.report("**********Charly:\n", entry.toWiki());
 		//System.out.println(entry.getDefTxt(1));
 		//System.out.println(entry.toWiki());
 		
@@ -65,6 +68,7 @@ public class EntryTest {
 		assertTrue(entry.getPronCount() == 0);
 		assertTrue(entry.getDefTxt(1).contains(";1: {{hipocorístico|leng=en|Charles}}."));
 		assertTrue(entry.getDefTxt(2).contains(";1: {{hipocorístico|leng=en|Charlene}}."));
+		assertTrue(entry.getDefTxt(3).contains(";1: {{hipocorístico|leng=en|Charlotte}}."));		
 	}	
 
 	@Test
@@ -77,7 +81,7 @@ public class EntryTest {
 		{
 			entry = En2Es.buildEntry("", pentry);
 			//System.out.println("Colombia defcount:" + entry.getDefsCount());
-			//System.out.println(entry.toWiki());			
+			//Util.report("Colombia:", entry.toWiki());			
 		}
 		catch(Exception ex)
 		{
@@ -86,6 +90,7 @@ public class EntryTest {
 		assertTrue(entry.getEtimCount() == 1);
 		assertTrue(entry.getDefsCount() == 1);
 		assertTrue(entry.getPronCount() == 2);
+		assertTrue(entry.getDefTxt(1).contains(";1: Un país en Sudamérica"));
 		
 	}
 
@@ -106,14 +111,20 @@ public class EntryTest {
 		ParserEntry pentry = new ParserEntry("en", "Hanna", ParserTest.WIKITEXT_HANNA);	
 		entry = En2Es.buildEntry("", pentry);
 		
-		Util.report("**********Hanna:\n", entry.toWiki());
-		//System.out.println("Hanna def1:" + entry.getDefTxt(1));
+		//Util.report("**********Hanna:\n", entry.toWiki());
+		//Util.report("Hanna def5:",  entry.getDefTxt(5));
 		
 		assertTrue(entry.getEtimCount()==2);	
 		assertTrue(entry.getDefsCount()==13);
 		assertTrue(entry.getPronCount() == 0);
 		assertTrue(entry.getDefTxt(1).contains(";1: {{antropónimo femenino|leng=en}}."));
-		assertTrue(entry.getDefTxt(2).contains(";1: {{apellido|leng=en}}."));		
+		assertTrue(entry.getDefTxt(2).contains(";1: {{apellido|leng=en}}."));
+		assertTrue(entry.getDefTxt(3).contains("Un pueblo en la provincia de Alberta, Canadá."));
+		assertTrue(entry.getDefTxt(4).contains("Una villa en Polonia."));
+		assertTrue(entry.getDefTxt(5).contains("Una comunidad en el estado de Louisiana, Estados Unidos."));
+		assertTrue(entry.getDefTxt(6).contains("Un pueblo en el estado de Oklahoma, Estados Unidos."));		
+		assertTrue(entry.getDefTxt(7).contains("Una comunidad en el estado de Virginia del Este, Estados Unidos."));
+		assertTrue(entry.getDefTxt(8).contains("Un pueblo en el estado de Wyoming, Estados Unidos."));
 	}
 
 	

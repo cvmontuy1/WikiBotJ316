@@ -40,6 +40,7 @@ public class Parser
 	        {
 	        	text = wikitext.trim();
 	        }
+	        text = parserPhase1(text);
 	        parseRecursive(text, 0, text.length(), rootToken);
 	        return rootToken;
 	    }	
@@ -47,6 +48,10 @@ public class Parser
 /***************************************************
  * 	PRIVATE SECTION
  */
+	   private String parserPhase1(String original)
+	   {
+		   return original.replaceAll(TEMPLATE_WIKI , "$1").replaceAll(TEMPLATE2, "$1"); 
+	   }
 
 	    private int parseRecursive(String wikitext, int startPos, int endPos, Token parentToken) {
 	    	Token child;
@@ -294,10 +299,12 @@ public class Parser
 	    	}	    	    	
 	    }	    
    
-	    private final static String WORDS = "([A-Za-z0-9\\-áéíóúñÑàèìòùäëïöüâêîôûæœçÁÉÍÓÚÄËÏÖÜÆŒÇ&\\s\\,\\.\\:\\;]+)";
+	    private final static String WORDS = "([A-Za-z0-9/\\-áéíóúñÑàèìòùäëïöüâêîôûæœçÁÉÍÓÚÄËÏÖÜÆŒÇ&\\s\\,\\.\\:\\;]+)";
 	    
 	    private static final Map<TokenType, Pattern> PATTERNS = new HashMap<TokenType, Pattern>();
 	    public static final Pattern PAT_LINK = Pattern.compile("\\[\\[" + WORDS + "(\\|" + WORDS+")?\\]\\]");
+	    public static final String  TEMPLATE_WIKI = "\\{\\{w\\|" + WORDS + "\\}\\}";
+	    public static final String  TEMPLATE2 =  "<<" + WORDS + ">>";
 	    
 	    static 
 	    {    

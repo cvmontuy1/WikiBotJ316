@@ -184,8 +184,12 @@ public class Definition {
 				buffer.append(getText());
 				if( hasParentText() )
 				{
-					buffer.append(", ").append(getParentText());
+					if( !buffer.toString().endsWith(getParentText()) )
+					{
+						buffer.append(", ").append(getParentText());
+					}
 				}
+				buffer.append(".");
 				buffer.append(Util.LF);
 				++iDef;				
 				break;

@@ -64,13 +64,35 @@ public class TextParser {
 	{
 		return filter0(words, CONNECTORS);
 	}
+	
+	public static String filterPlaceType(String words)
+	{
+		StringBuilder buffer = new StringBuilder();		
+		List<String> lwords;
+
+		lwords = filter0(words, PLACE_ADJ);
+		for(String str : lwords)
+		{
+			if( !buffer.isEmpty() )
+			{
+				buffer.append(" ");
+			}
+			buffer.append(str);
+		}
+		return buffer.toString();
+	}
 
 	
 
-/*************
+/********************************************************************************
  * PRIVATE SECITON
  */
-	
+	/**
+	 * Returns  		a list of words
+	 * @param words		String having several words
+	 * @param filter	list of words to be ignored
+	 * @return
+	 */
 	private static List<String> filter0(String words, String[] filter)
 	{
 		List<String> filtered;		
@@ -109,11 +131,11 @@ public class TextParser {
 	private static String[] split(String str)
 	{
 		String[] words;
-		String regex = "(\\s*,\\s+of\\s+|\\s*,\\s*|\\s+and\\sof\\s+|\\s+and\\s+|\\s+or\\s+|\\s+or\\s?,|\\s+of\\s+|:|;|\\.|\\[\\[|\\]\\]|\\s+)";
+		String regex = "(\\s*,\\s*|\\s+and\\s+|\\s+or\\s+|/|:|;|\\.|\\[\\[|\\]\\]|\\s+)";
 		words = null;
 		if( str != null )
 		{
-			if( str.contains(" and ") || str.contains(" or ") || str.contains(",") || str.contains(" of ") || str.contains(" the ") || str.contains(" a ") || str.contains(" an "))
+			if( str.contains(" ") || str.contains(",") || str.contains(".") || str.contains("/") )
 			{
 				words = str.split(regex);
 				for(int iWord=0; iWord < words.length; ++iWord)
@@ -139,7 +161,10 @@ public class TextParser {
 	private final static Pattern PAT_DIM1 = Pattern.compile("A?\\s+diminutive\\s+of\\s+" + WORDS + "+", Pattern.MULTILINE);	
 	private final static Pattern PAT_DIM2 = Pattern.compile("A?\\s+shortening\\s+of\\s+" + WORDS + "+", Pattern.MULTILINE);
 	
-	private final static String[] LOC_ADJ = {"inhabited", ""};
+	private final static String[] PLACE_ADJ = {
+										"eastern", "from", "flowing", "former",  "inhabited", "in", "inner", "major", "minor", "northern", "on", "outer", "residential", 
+										"rural",  "sizable", "small", "southern", "statutory", "tiny", "unincorporated", "urban", "western"};
+	
 	private final static String[] CONNECTORS = { "a", "an", "in", "on", "of", "and", "or", "from", "the"};
 	private final static String[] NO_NOUNS = {
 			"female", "male", "ambiguous", "unisex",
