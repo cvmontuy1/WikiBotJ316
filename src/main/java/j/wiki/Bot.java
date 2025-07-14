@@ -31,7 +31,7 @@ import java.util.logging.LogManager;
 import org.wikipedia.Wiki;
 
 /**
- * Project version: 1.1g
+ * Project version: 1.1h
  * Main program
  * Executes a task
  * TODOS: 
